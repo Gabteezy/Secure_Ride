@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SecureRide</string>
+    <string name="app_client_id">47141709731-fu3c60uurkhq00df7lvhqrk5rr68mogn.apps.googleusercontent.com</string>
+    <string name="web_client_id">47141709731-t2aesqnip0euq9j64dkcu6k61o96v5s5.apps.googleusercontent.com</string>
+
+
 </resources>

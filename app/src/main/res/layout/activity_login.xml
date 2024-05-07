@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent"
     android:padding="20dp"
-    tools:context=".LoginActivity">
+    tools:context="LoginActivity">
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -98,7 +99,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:padding="10dp"
+        android:padding="20dp"
+        android:backgroundTint="@color/blue"
         android:text="LOGIN"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -126,6 +128,8 @@
         android:layout_marginTop="30dp"
         android:padding="10dp"
         android:text="Sign in with Google"
+        android:backgroundTint="@color/white"
+        android:drawableStart="@drawable/google_icon"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btnSubmit"
@@ -147,6 +151,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Register"
+        android:backgroundTint="@color/gray"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
