@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navCustomerHome"
+        android:icon="@drawable/vector_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/navCustomerFindRide"
+        android:icon="@drawable/vector_find"
+        android:title="Find Ride" />
+    <item
+        android:id="@+id/navCustomerMyRides"
+        android:icon="@drawable/vector_myrides"
+        android:title="My Rides" />
+    <item
+        android:id="@+id/navCustomerSettings"
+        android:icon="@drawable/vector_setting"
+        android:title="Settings" />
+</menu>
