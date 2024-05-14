@@ -76,6 +76,7 @@
             android:id="@+id/linear1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:padding="10dp"
             android:orientation="vertical">
 
@@ -84,9 +85,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Real-time Driver Tracking"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
+                android:layout_gravity="start"
+                android:layout_marginBottom="20dp"
+                android:gravity="start"
                 android:textSize="16sp"
                 android:textStyle="bold|italic" />
 
@@ -95,9 +96,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Transparent Pricing"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
+                android:layout_gravity="start"
+                android:layout_marginBottom="20dp"
+                android:gravity="start"
                 android:textSize="16sp"
                 android:textStyle="bold|italic" />
 
@@ -106,9 +107,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Book rides hassle-free with SecureRide"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
+                android:layout_gravity="start"
+                android:layout_marginBottom="20dp"
+                android:gravity="start"
                 android:textSize="16sp"
                 android:textStyle="bold|italic" />
 
@@ -117,11 +118,24 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="8 hours Customer Report"
+                android:layout_gravity="start"
+                android:layout_marginBottom="20dp"
+                android:gravity="start"
+                android:textSize="16sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="Select payment frequency"
                 android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:textStyle="bold|italic" />
+
+
 
 
 
