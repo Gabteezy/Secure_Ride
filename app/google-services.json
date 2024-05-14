@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "528051189256",
-    "project_id": "ride-3c2bc",
-    "storage_bucket": "ride-3c2bc.appspot.com"
+    "project_number": "508548829715",
+    "project_id": "ride-e16d9",
+    "storage_bucket": "ride-e16d9.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:528051189256:android:f831a5ac5de567a274c3bd",
+        "mobilesdk_app_id": "1:508548829715:android:64c320a6023653d80f65e6",
         "android_client_info": {
           "package_name": "com.aces.capstone.secureride"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBFb98aPYDdoEHx-859e9zIGVcczETIchY"
+          "current_key": "AIzaSyDQ4tbrjZ5sODI20Fs6HSE1T_o_aCkTkYI"
         }
       ],
       "services": {
