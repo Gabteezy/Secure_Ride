@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnLogin.setOnClickListener {
-            val intent = Intent(this@LoginActivity, UserDashboard::class.java)
+            val intent = Intent(this@LoginActivity, Map::class.java)
             startActivity(intent)
         }
 

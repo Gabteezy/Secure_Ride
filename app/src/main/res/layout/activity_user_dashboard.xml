@@ -3,25 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
+    android:background="@color/gray"
     android:layout_height="match_parent"
     tools:context=".UserDashboard">
-
-
 
 
     <TextView
         android:id="@+id/userDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:fontFamily="sans-serif-smallcaps"
         android:padding="20dp"
         android:text="SecureRide"
+        android:textColor="@color/white"
         android:textSize="26sp"
-        android:textStyle="bold|italic" />
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -40,7 +39,8 @@
         android:layout_height="0dp"
         android:nestedScrollingEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:padding="10dp"
+        android:background="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userDisplayName"

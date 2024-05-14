@@ -50,6 +50,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
 
+    // Google dependencies
+    implementation ("com.google.android.gms:play-services-maps:18.1.8")
 //    firebase
 
     implementation("com.google.firebase:firebase-auth:23.0.0")
