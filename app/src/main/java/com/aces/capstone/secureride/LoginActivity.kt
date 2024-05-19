@@ -11,7 +11,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class LoginActivity : AppCompatActivity() {
+class Login : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var firebaseDatabase: FirebaseDatabase
