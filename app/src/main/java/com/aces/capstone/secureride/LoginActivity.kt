@@ -28,22 +28,21 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btnLogin.setOnClickListener {
             val email = binding.username.text.toString()
-            val password = binding.password.text.toString()
+            val password = binding.passWord.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                loginUser(email, password)
+                LoginUser(email, password)
             } else {
                 showToast("All fields are mandatory")
             }
         }
 
-        binding.btnRegister.setOnClickListener {
-            startActivity(Intent(this@LoginActivity, UserRegister::class.java))
-            finish()
+        binding.btnUser.setOnClickListener {
+            startActivity(Intent(this@LoginActivity, LoginUser::class.java))
         }
     }
 
-    private fun loginUser(email: String, password: String) {
+    private fun LoginUser(email: String, password: String) {
         databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -52,15 +51,13 @@ class LoginActivity : AppCompatActivity() {
                         val userData = userSnapshot.getValue(UserData::class.java)
                         if (userData != null && userData.password == password) {
                             showToast("Login Successful")
-                            startActivity(Intent(this@LoginActivity, UserDashboard::class.java))
-                            finish()
-                            loginSuccessful = true
-                            break
+                            val intent = Intent(this@LoginActivity, UserRegister::class.java)
+                            intent.putExtra("user", "some_user_type") // Replace "some_user_type" with the actual user type
+                            startActivity(intent)
+                            return // Exit the function after starting the new activity
                         }
                     }
-                    if (!loginSuccessful) {
-                        showToast("Invalid email or password")
-                    }
+                    showToast("Invalid email or password")
                 } else {
                     showToast("User does not exist")
                 }
@@ -76,4 +73,3 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
     }
 }
-
