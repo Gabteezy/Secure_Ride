@@ -81,16 +81,8 @@ class LoginUser : AppCompatActivity() {
     }
 
     private fun setupButtonClickListeners() {
-        binding.btnDriver.setOnClickListener {
-            showRegisterForm("Driver")
-        }
-
-        binding.btnAdmin.setOnClickListener {
-            showRegisterForm("Admin")
-        }
-
-        binding.btnUser.setOnClickListener {
-            showRegisterForm("User")
+        binding.registerAs.setOnClickListener {
+            startActivity(Intent(this@LoginUser, RegisterAs::class.java))
         }
 
         binding.btnLogin.setOnClickListener {
@@ -179,15 +171,15 @@ class LoginUser : AppCompatActivity() {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun showRegisterForm(userType: String) {
-
-        Log.d("REGISTER", userType)
-        val intent = Intent(this@LoginUser, UserRegister::class.java)
-        intent.putExtra("user", userType)
-        startActivity(intent)
-        finish()
-
-    }
+//    private fun showRegisterForm(userType: String) {
+//
+//        Log.d("REGISTER", userType)
+//        val intent = Intent(this@LoginUser, UserRegister::class.java)
+//        intent.putExtra("user", userType)
+//        startActivity(intent)
+//        finish()
+//
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

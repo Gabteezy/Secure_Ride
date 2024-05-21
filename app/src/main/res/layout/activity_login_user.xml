@@ -137,6 +137,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/white"
                 android:drawableStart="@drawable/google_icon"
+                android:layout_marginBottom="20dp"
                 android:padding="10dp"
                 android:text="Sign in with Google"
                 android:textSize="16sp"
@@ -146,38 +147,36 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnUser"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/register"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Register as User"
-                android:backgroundTint="@color/yellow"
+                android:gravity="start"
+                android:layout_gravity="start"
+                android:layout_marginBottom="-22dp"
+                android:text="Don't have account yet?"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textStyle="normal"
+                app:layout_constraintTop_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/registerAs" />
+
+            <TextView
+                android:id="@+id/registerAs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="175dp"
+                android:textColor="@color/blue"
+                android:textStyle="bold|normal"
+                android:text="Register as"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@id/register"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnDriver"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Register as Driver"
-                android:backgroundTint="@color/yellow"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnAdmin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Register as Admin"
-                android:backgroundTint="@color/yellow"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
 
 
             <ProgressBar
