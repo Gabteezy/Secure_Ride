@@ -15,11 +15,21 @@
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
         <activity
+            android:name=".AdminDashboard"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
+        <activity
+            android:name=".DriverDashboard"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
+        <activity
             android:name=".LoginUser"
-            android:exported="false" />
+            android:exported="false"
+        android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
             android:name=".Pricing"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
             android:name=".BookingDetails"
             android:exported="false"
@@ -40,10 +50,6 @@
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
             android:name=".UserDashboard"
-            android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar" />
-        <activity
-            android:name=".RiderRegister"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity

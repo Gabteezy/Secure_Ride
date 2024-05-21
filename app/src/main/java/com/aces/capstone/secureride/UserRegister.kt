@@ -87,8 +87,8 @@ class UserRegister : AppCompatActivity() {
                                 .addListenerForSingleValueEvent(object : ValueEventListener {
                                     override fun onDataChange(snapshot: DataSnapshot) {
                                         if (snapshot.hasChild(firebaseAuth.currentUser?.uid ?: "")) {
-                                            Log.d("REGISTER", "User is already Registered!")
-                                            Toast.makeText(this@UserRegister, "User is already Registered!", Toast.LENGTH_SHORT).show()
+                                            Log.d("REGISTER", "$userType is already Registered!")
+                                            Toast.makeText(this@UserRegister, "$userType is already Registered!", Toast.LENGTH_SHORT).show()
                                         } else {
                                             val userId = firebaseAuth.currentUser?.uid ?: ""
                                             if (userId.isNotEmpty()) {
@@ -108,10 +108,10 @@ class UserRegister : AppCompatActivity() {
                                                 databaseRef.setValue(user)
                                                     .addOnCompleteListener { task ->
                                                         if (task.isSuccessful) {
-                                                            Log.d("REGISTER", "User has been successfully Registered!")
+                                                            Log.d("REGISTER", "$userType has been successfully Registered!")
                                                             Toast.makeText(
                                                                 this@UserRegister,
-                                                                "User has been successfully Registered!",
+                                                                "$userType has been successfully Registered!",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
 
@@ -119,17 +119,17 @@ class UserRegister : AppCompatActivity() {
                                                             val intent = Intent(this@UserRegister, LoginActivity::class.java)
                                                             startActivity(intent)
                                                         } else {
-                                                            Log.e("REGISTER", "Error registering user: ${task.exception}")
+                                                            Log.e("REGISTER", "Error registering $userType: ${task.exception}")
                                                             Toast.makeText(
                                                                 this@UserRegister,
-                                                                "Error registering user: ${task.exception?.message}",
+                                                                "Error registering $userType: ${task.exception?.message}",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
                                                         }
                                                     }
                                             } else {
-                                                Log.e("REGISTER", "Current user ID is null or empty.")
-                                                Toast.makeText(this@UserRegister, "Current user ID is null or empty.", Toast.LENGTH_SHORT).show()
+                                                Log.e("REGISTER", "Current $userType ID is null or empty.")
+                                                Toast.makeText(this@UserRegister, "Current $userType ID is null or empty.", Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     }

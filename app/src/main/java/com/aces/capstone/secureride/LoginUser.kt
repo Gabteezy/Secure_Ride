@@ -72,16 +72,21 @@ class LoginUser : AppCompatActivity() {
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.app_client_id))
-//            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
             .requestEmail()
             .build()
 
-
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        setupButtonClickListeners()
+    }
 
+    private fun setupButtonClickListeners() {
         binding.btnDriver.setOnClickListener {
             showRegisterForm("Driver")
+        }
+
+        binding.btnAdmin.setOnClickListener {
+            showRegisterForm("Admin")
         }
 
         binding.btnUser.setOnClickListener {
@@ -89,48 +94,49 @@ class LoginUser : AppCompatActivity() {
         }
 
         binding.btnLogin.setOnClickListener {
-
             val username = binding.username.text.toString()
             val password = binding.passWord.text.toString()
 
-
             if (username.isEmpty() || password.isEmpty()) {
-                if (username.isEmpty()) {
-                    binding.username.error = "Please enter username/email."
-                }
-                if (password.isEmpty()) {
-                    binding.passWord.error = "Please enter a password."
-                }
-                if (!ValidEmail(username)) {
-                    binding.username.error = "Please enter an email or a valid email."
-                }
-                Toast.makeText(this, "Please check following error(s)!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }else{
-                firebaseAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener {
-                    Log.d("SIGN_IN_WITH_EMAIL_PASSWORD", it.toString())
-                    if (it.isSuccessful) {
-                        Log.d(
-                            "LOGIN",
-                            "Successfully Login"
-                        )
-                        checkUserAccount()
-                    } else {
-                        Log.d(
-                            "LOGIN",
-                            it.exception!!.message.toString()
-                        )
-                        Toast.makeText(
-                            this,
-                            "Either your username or password is Invalid! Please try again!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+                handleEmptyFields()
+            } else {
+                signInWithEmailAndPassword(username, password)
             }
         }
+    }
 
-        binding.btnGoogle.setOnClickListener {
+    private fun handleEmptyFields() {
+        if (binding.username.text!!.isEmpty()) {
+            binding.username.error = "Please enter username/email."
+        }
+        if (binding.passWord.text!!.isEmpty()) {
+            binding.passWord.error = "Please enter a password."
+        }
+        if (!ValidEmail(binding.username.text.toString())) {
+            binding.username.error = "Please enter an email or a valid email."
+        }
+        Toast.makeText(this, "Please check following error(s)!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun signInWithEmailAndPassword(username: String, password: String) {
+        firebaseAuth.signInWithEmailAndPassword(username, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("LOGIN", "Successfully Login")
+                    checkUserAccount()
+                } else {
+                    Log.d("LOGIN", task.exception!!.message.toString())
+                    Toast.makeText(
+                        this,
+                        "Either your username or password is Invalid! Please try again!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+
+
+    binding.btnGoogle.setOnClickListener {
 
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -256,90 +262,65 @@ class LoginUser : AppCompatActivity() {
         firebaseDatabaseReference.child("user")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-
-                    Log.d(
-                        TAG,
-                        "firebaseAuthWithGoogle: Checking User if ${firebaseAuth.currentUser!!.uid} Exist!"
-                    )
+                    Log.d(TAG, "firebaseAuthWithGoogle: Checking User if ${firebaseAuth.currentUser!!.uid} Exist!")
                     if (snapshot.hasChild(firebaseAuth.currentUser!!.uid)) {
-
                         Log.d(TAG, "firebaseAuthWithGoogle: Retrieving User Details")
-                        this@LoginUser.userType =
-                            snapshot.child(firebaseAuth.currentUser!!.uid).child("type")
-                                .getValue(String::class.java).toString()
-                        this@LoginUser.userName =
-                            snapshot.child(firebaseAuth.currentUser!!.uid).child("email")
-                                .getValue(String::class.java).toString() + " " + snapshot.child(
-                                firebaseAuth.currentUser!!.uid
-                            ).child("Lastname").getValue(String::class.java).toString()
+                        this@LoginUser.userType = snapshot.child(firebaseAuth.currentUser!!.uid).child("type")
+                            .getValue(String::class.java).toString()
+                        this@LoginUser.userName = snapshot.child(firebaseAuth.currentUser!!.uid).child("email")
+                            .getValue(String::class.java).toString() + " " + snapshot.child(
+                            firebaseAuth.currentUser!!.uid
+                        ).child("Lastname").getValue(String::class.java).toString()
 
-                        Log.d(
-                            TAG,
-                            "firebaseAuthWithGoogle:User Details ${"$userType - $userName"} Exist!"
-                        )
+                        Log.d(TAG, "firebaseAuthWithGoogle:User Details ${"$userType - $userName"} Exist!")
                         logged()
-
-//                        val isVerified: Boolean =
-//                            snapshot.child(firebaseAuth.currentUser!!.uid).child("verified")
-//                                .getValue(Boolean::class.java)!!
-//                        checkIfVerified(isVerified)
                     } else {
                         Log.d(TAG, "firebaseAuthWithGoogle: User not Registered")
                         binding.progressBar.visibility = View.GONE
-                        Toast.makeText(this@LoginUser, "User not registered", Toast.LENGTH_SHORT);
+                        Toast.makeText(this@LoginUser, "User not registered", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     binding.progressBar.visibility = View.GONE
-                    Log.d(
-                        TAG,
-                        "firebaseAuthWithGoogle: Error Checking User due to ${error.message}"
-                    )
-                    Toast.makeText(
-                        this@LoginUser,
-                        "onCancelled due to : " + error.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.d(TAG, "firebaseAuthWithGoogle: Error Checking User due to ${error.message}")
+                    Toast.makeText(this@LoginUser, "onCancelled due to : " + error.message, Toast.LENGTH_SHORT).show()
                 }
             })
-
     }
 
     private fun logged() {
         Handler(Looper.getMainLooper()).postDelayed({
-
             binding.progressBar.visibility = View.GONE
 
-            if (userType == "Driver") {
-
-                Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Driver")
-                Toast.makeText(this, "Logged In as Driver", Toast.LENGTH_LONG);
-
-
-
-            } else if (userType == "User") {
-                Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as User")
-                Toast.makeText(this, "Logged In as User", Toast.LENGTH_LONG);
-                val intent = Intent(this, UserDashboard::class.java)
-                intent.putExtra("user", userType)
-                startActivity(intent)
-                finish()
-            } else {
-                Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as User")
-                Toast.makeText(this, "Logged In as User", Toast.LENGTH_LONG);
-
-
-                val intent = Intent(this, UserDashboard::class.java)
-                intent.putExtra("user", userType)
-
-                startActivity(intent)
-                finish()
+            val intent = when (userType) {
+                "Driver" -> {
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Driver")
+                    Toast.makeText(this, "Logged In as Driver", Toast.LENGTH_LONG).show()
+                    Intent(this, DriverDashboard::class.java)
+                }
+                "User" -> {
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as User")
+                    Toast.makeText(this, "Logged In as User", Toast.LENGTH_LONG).show()
+                    Intent(this, UserDashboard::class.java)
+                }
+                "Admin" -> {
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
+                    Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
+                    Intent(this, AdminDashboard::class.java)
+                }
+                else -> {
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
+                    Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
+                    Intent(this, AdminDashboard::class.java)
+                }
             }
 
-
-
+            intent.putExtra("user", userType)
+            startActivity(intent)
+            finish()
         }, 3000) // 3000 is the delayed time in milliseconds.
     }
+
 
 }
