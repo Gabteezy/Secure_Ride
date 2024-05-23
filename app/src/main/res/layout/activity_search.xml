@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:background="@color/gray"
     android:layout_height="match_parent"
-    tools:context=".UserDashboard">
+    tools:context=".Search">
 
 
 
@@ -53,15 +53,16 @@
             android:orientation="vertical">
 
 
-            <Button
-                android:id="@+id/search"
+            <SearchView
+                android:id="@+id/searchView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
+                android:layout_margin="16dp"
                 android:background="@drawable/button_border"
                 android:fontFamily="sans-serif-smallcaps"
-                android:padding="20dp"
-                android:text="Enter Destination"
+                android:iconifiedByDefault="false"
+                android:padding="10dp"
+                android:queryHint="Enter Destination"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
                 android:textSize="10sp"
@@ -113,14 +114,6 @@
                 android:textStyle="bold|italic" />
 
 
-            <Button
-                android:id="@+id/book"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="300dp"
-                android:layout_marginTop="-50dp"
-                android:backgroundTint="@color/black"
-                android:text="Book" />
 
 
 
@@ -176,7 +169,7 @@
 
 
             <Button
-                android:id="@+id/confirmbooking"
+                android:id="@+id/confirmBooking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="40dp"
@@ -231,14 +224,6 @@
                     android:textStyle="bold|italic" />
 
 
-                <Button
-                    android:id="@+id/book1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="300dp"
-                    android:layout_marginTop="-50dp"
-                    android:backgroundTint="@color/black"
-                    android:text="Book" />
 
 
                 <TextView
@@ -293,7 +278,7 @@
 
 
                 <Button
-                    android:id="@+id/confirmbooking1"
+                    android:id="@+id/confirmBooking1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="40dp"
@@ -346,15 +331,6 @@
                         android:textSize="12sp"
                         android:textStyle="bold|italic" />
 
-
-                    <Button
-                        android:id="@+id/book2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="300dp"
-                        android:layout_marginTop="-50dp"
-                        android:backgroundTint="@color/black"
-                        android:text="Book" />
 
 
                     <TextView
@@ -409,7 +385,7 @@
 
 
                     <Button
-                        android:id="@+id/confirmbooking2"
+                        android:id="@+id/confirmBooking2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="40dp"

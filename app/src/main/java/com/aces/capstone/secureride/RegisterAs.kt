@@ -89,8 +89,8 @@ class RegisterAs : AppCompatActivity() {
             showRegisterForm("Admin")
         }
 
-        binding.btnUser.setOnClickListener {
-            showRegisterForm("User")
+        binding.btnCommuter.setOnClickListener {
+            showRegisterForm("Commuter")
         }
 
     }

@@ -1,68 +1,67 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    tools:context=".LoginUser" >
-
+    android:background="@color/white"
+    tools:context=".LoginUser">
 
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:nestedScrollingEnabled="true">
+        app:layout_constraintTop_toTopOf="parent">
+
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linear1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:orientation="vertical"
+            android:padding="20dp"
             tools:ignore="MissingConstraints">
+
 
             <ImageView
                 android:id="@+id/logoImageView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:src="@drawable/logo"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/welcomeTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/welcomeTextView" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/welcomeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-smallcaps"
-                android:text="SecureRide"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
+                android:text="SecureRide"
                 android:textSize="30sp"
                 android:textStyle="bold|italic"
-                app:layout_constraintTop_toBottomOf="@id/logoImageView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/logoImageView" />
 
             <TextView
                 android:id="@+id/descriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:text="Book Tricycles easily and track your booking status."
                 android:textSize="14sp"
                 android:textStyle="normal"
-                app:layout_constraintTop_toBottomOf="@id/welcomeTextView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -71,9 +70,9 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 app:endIconMode="clear_text"
-                app:layout_constraintTop_toBottomOf="@id/descriptionTextView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/descriptionTextView">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/username"
@@ -90,9 +89,9 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 app:endIconMode="password_toggle"
-                app:layout_constraintTop_toBottomOf="@id/usernameTextInputLayout"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/usernameTextInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/passWord"
@@ -126,18 +125,18 @@
                 android:text="OR"
                 android:textSize="16sp"
                 android:textStyle="bold|italic"
-                app:layout_constraintTop_toBottomOf="@id/btnLogin"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnGoogle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:backgroundTint="@color/white"
                 android:drawableStart="@drawable/google_icon"
-                android:layout_marginBottom="20dp"
                 android:padding="10dp"
                 android:text="Sign in with Google"
                 android:textSize="16sp"
@@ -151,46 +150,40 @@
                 android:id="@+id/register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:layout_gravity="start"
                 android:layout_marginBottom="-22dp"
+                android:gravity="start"
                 android:text="Don't have account yet?"
                 android:textSize="16sp"
                 android:textStyle="normal"
-                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/registerAs"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/registerAs" />
+                app:layout_constraintTop_toBottomOf="parent" />
 
             <TextView
                 android:id="@+id/registerAs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_marginStart="175dp"
-                android:textColor="@color/blue"
-                android:textStyle="bold|normal"
+                android:gravity="center"
                 android:text="Register as"
+                android:textColor="@color/blue"
                 android:textSize="16sp"
-                app:layout_constraintTop_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="@id/register"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-
-
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:textStyle="bold|normal"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintStart_toStartOf="@id/register"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,14 +1,19 @@
 package com.aces.capstone.secureride
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.Toast
+import com.aces.capstone.secureride.databinding.ActivityBookingDetailsBinding
+import com.aces.capstone.secureride.databinding.ActivitySearchBinding
 
 class BookingDetails : AppCompatActivity() {
+    private lateinit var binding: ActivityBookingDetailsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityBookingDetailsBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_booking_details)
 
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
@@ -37,7 +42,9 @@ class BookingDetails : AppCompatActivity() {
             Toast.makeText(this, "4:00pm selected", Toast.LENGTH_SHORT).show()
         }
 
-
+        binding.confirm.setOnClickListener {
+            startActivity(Intent(this@BookingDetails, Map::class.java))
+        }
 
 
     }

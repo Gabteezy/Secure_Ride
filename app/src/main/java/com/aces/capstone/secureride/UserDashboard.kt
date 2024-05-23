@@ -3,31 +3,50 @@ package com.aces.capstone.secureride
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.SearchView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.content.Intent
+import com.aces.capstone.secureride.databinding.ActivityUserDashboardBinding
 
 class UserDashboard : AppCompatActivity() {
+
+    private lateinit var binding: ActivityUserDashboardBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_dashboard)
+        binding = ActivityUserDashboardBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        val bottomNavigationView: BottomNavigationView = binding.dashboardNav
 
-        val searchView: SearchView = findViewById(R.id.searchView)
+        setupBottomNavigation(bottomNavigationView)
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // Handle the search query submission
-                query?.let {
-                    // Perform search operation
+        binding.book.setOnClickListener {
+            startActivity(Intent(this@UserDashboard, Search::class.java))
+        }
+        binding.book1.setOnClickListener {
+            startActivity(Intent(this@UserDashboard, Search::class.java))
+        }
+    }
+
+    private fun setupBottomNavigation(bottomNavigationView: BottomNavigationView) {
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navCustomerHome -> {
+                    // Home is already selected, no action needed
+                    true
                 }
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Handle the search query text change
-                newText?.let {
-                    // Update search results in real-time
+                R.id.navCustomerFindRide -> {
+                    // Navigate to SearchActivity
+                    startActivity(Intent(this@UserDashboard, Search::class.java))
+                    true
                 }
-                return false
+                R.id.navCustomerMyRides -> {
+                    // Navigate to Map activity
+                    startActivity(Intent(this@UserDashboard, Map::class.java))
+                    true
+                }
+                else -> false
             }
-        })
+        }
     }
 }

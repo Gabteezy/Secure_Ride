@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import android.util.Patterns
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -49,7 +48,6 @@ class LoginUser : AppCompatActivity() {
 
     private lateinit var userName: String
     private var userType = "UNKNOWN"
-
 
 
     companion object {
@@ -128,7 +126,7 @@ class LoginUser : AppCompatActivity() {
 
 
 
-    binding.btnGoogle.setOnClickListener {
+        binding.btnGoogle.setOnClickListener {
 
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -254,34 +252,50 @@ class LoginUser : AppCompatActivity() {
         firebaseDatabaseReference.child("user")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Checking User if ${firebaseAuth.currentUser!!.uid} Exist!")
+                    Log.d(
+                        TAG,
+                        "firebaseAuthWithGoogle: Checking User if ${firebaseAuth.currentUser!!.uid} Exist!"
+                    )
                     if (snapshot.hasChild(firebaseAuth.currentUser!!.uid)) {
-                        Log.d(TAG, "firebaseAuthWithGoogle: Retrieving User Details")
-                        this@LoginUser.userType = snapshot.child(firebaseAuth.currentUser!!.uid).child("type")
-                            .getValue(String::class.java).toString()
-                        this@LoginUser.userName = snapshot.child(firebaseAuth.currentUser!!.uid).child("email")
-                            .getValue(String::class.java).toString() + " " + snapshot.child(
-                            firebaseAuth.currentUser!!.uid
-                        ).child("Lastname").getValue(String::class.java).toString()
+                        this@LoginUser.userType =
+                            snapshot.child(firebaseAuth.currentUser!!.uid).child("type")
+                                .getValue(String::class.java).toString()
+                        Log.d(TAG, "firebaseAuthWithGoogle: Retrieving User Type $userType")
 
-                        Log.d(TAG, "firebaseAuthWithGoogle:User Details ${"$userType - $userName"} Exist!")
-                        logged()
+                        this@LoginUser.userName =
+                            snapshot.child(firebaseAuth.currentUser!!.uid).child("email")
+                                .getValue(String::class.java)
+                                .toString() + " " + firebaseAuth.currentUser!!.uid
+
+                        Log.d(
+                            TAG,
+                            "firebaseAuthWithGoogle:User Details ${"$userType - $userName"} Exist!"
+                        )
+                        logged(this@LoginUser.userType)
                     } else {
                         Log.d(TAG, "firebaseAuthWithGoogle: User not Registered")
                         binding.progressBar.visibility = View.GONE
-                        Toast.makeText(this@LoginUser, "User not registered", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginUser, "User not registered", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     binding.progressBar.visibility = View.GONE
-                    Log.d(TAG, "firebaseAuthWithGoogle: Error Checking User due to ${error.message}")
-                    Toast.makeText(this@LoginUser, "onCancelled due to : " + error.message, Toast.LENGTH_SHORT).show()
+                    Log.d(
+                        TAG,
+                        "firebaseAuthWithGoogle: Error Checking User due to ${error.message}"
+                    )
+                    Toast.makeText(
+                        this@LoginUser,
+                        "onCancelled due to : " + error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
     }
 
-    private fun logged() {
+    private fun logged(userType: String) {
         Handler(Looper.getMainLooper()).postDelayed({
             binding.progressBar.visibility = View.GONE
 
@@ -291,16 +305,19 @@ class LoginUser : AppCompatActivity() {
                     Toast.makeText(this, "Logged In as Driver", Toast.LENGTH_LONG).show()
                     Intent(this, DriverDashboard::class.java)
                 }
-                "User" -> {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as User")
-                    Toast.makeText(this, "Logged In as User", Toast.LENGTH_LONG).show()
+
+                "Commuter" -> {
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Commuter")
+                    Toast.makeText(this, "Logged In as Commuter", Toast.LENGTH_LONG).show()
                     Intent(this, UserDashboard::class.java)
                 }
+
                 "Admin" -> {
                     Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
                     Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
                     Intent(this, AdminDashboard::class.java)
                 }
+
                 else -> {
                     Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
                     Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
@@ -308,7 +325,7 @@ class LoginUser : AppCompatActivity() {
                 }
             }
 
-            intent.putExtra("user", userType)
+            intent.putExtra("user", this.userType)
             startActivity(intent)
             finish()
         }, 3000) // 3000 is the delayed time in milliseconds.
