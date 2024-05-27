@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Map">
+    tools:context=".MapActivity">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
@@ -13,12 +13,12 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_border"
         android:queryHint="Enter Destination"
-        android:textColor="@color/black"
-        android:textSize="14sp"
+        app:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:iconifiedByDefault="false" />
+        android:layout_margin="16dp"
+        app:theme="@style/SearchViewText"/>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapFragment"
@@ -26,8 +26,17 @@
         android:layout_height="0dp"
         class="com.google.android.gms.maps.SupportMapFragment"
         app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintBottom_toTopOf="@id/dashboardNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/dashboardNav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/customers_dashboard" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -42,7 +42,7 @@ class UserDashboard : AppCompatActivity() {
                 }
                 R.id.navCustomerMyRides -> {
                     // Navigate to Map activity
-                    startActivity(Intent(this@UserDashboard, Map::class.java))
+                    startActivity(Intent(this@UserDashboard, BookingDetails::class.java))
                     true
                 }
                 else -> false

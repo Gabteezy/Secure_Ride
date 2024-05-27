@@ -24,26 +24,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ImageView
-        android:id="@+id/logoImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/profile"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.929"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/white"
         android:nestedScrollingEnabled="true"
-        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userDisplayName"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-16dp">
 
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -114,9 +104,6 @@
                 android:textStyle="bold|italic" />
 
 
-
-
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -175,8 +162,8 @@
                 android:layout_margin="40dp"
                 android:background="@drawable/button_border"
                 android:fontFamily="sans-serif-smallcaps"
-                android:padding="20dp"
                 android:gravity="center"
+                android:padding="20dp"
                 android:text="Confirm Booking"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -188,7 +175,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
 
 
                 <ImageView
@@ -222,8 +208,6 @@
                     android:textColor="@color/black"
                     android:textSize="12sp"
                     android:textStyle="bold|italic" />
-
-
 
 
                 <TextView
@@ -332,7 +316,6 @@
                         android:textStyle="bold|italic" />
 
 
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -398,8 +381,6 @@
                         android:textColor="@color/black"
                         android:textSize="10sp"
                         android:textStyle="bold|italic" />
-
-
 
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
