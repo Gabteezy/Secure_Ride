@@ -14,7 +14,7 @@
         android:icon="@drawable/vector_myrides"
         android:title="My Rides" />
     <item
-        android:id="@+id/navCustomerUser"
+        android:id="@+id/navCustomerProfile"
         android:icon="@drawable/vector_user"
-        android:title="User" />
+        android:title="Profile" />
 </menu>

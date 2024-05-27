@@ -301,25 +301,25 @@ class LoginUser : AppCompatActivity() {
 
             val intent = when (userType) {
                 "Driver" -> {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Driver")
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged in as Driver")
                     Toast.makeText(this, "Logged In as Driver", Toast.LENGTH_LONG).show()
                     Intent(this, DriverDashboard::class.java)
                 }
 
                 "Commuter" -> {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Commuter")
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged in as Commuter")
                     Toast.makeText(this, "Logged In as Commuter", Toast.LENGTH_LONG).show()
                     Intent(this, UserDashboard::class.java)
                 }
 
                 "Admin" -> {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged in as Admin")
                     Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
                     Intent(this, AdminDashboard::class.java)
                 }
 
                 else -> {
-                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged In as Admin")
+                    Log.d(TAG, "firebaseAuthWithGoogle: Hi $userName you Logged in as Admin")
                     Toast.makeText(this, "Logged In as Admin", Toast.LENGTH_LONG).show()
                     Intent(this, AdminDashboard::class.java)
                 }

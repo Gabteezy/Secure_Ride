@@ -36,6 +36,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val destinationLatLng = LatLng(7.45, 125.82) // Example destination coordinates
+        showRouteToDestination(destinationLatLng)
 
         val bottomNavigationView: BottomNavigationView = binding.dashboardNav
 
@@ -92,6 +94,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mGoogleMap = googleMap
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGoogleMap.isMyLocationEnabled = true
+            val tagumCityBounds = LatLngBounds(
+                LatLng(7.4135, 125.8090), // Southwest corner of Tagum City
+                LatLng(7.4702, 125.8295)  // Northeast corner of Tagum City
+            )
+            mGoogleMap.setLatLngBoundsForCameraTarget(tagumCityBounds) // Limit map to Tagum City bounds
             getCurrentLocation()
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
@@ -122,7 +129,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val addresses = geocoder.getFromLocationName(query, 1)
             if (addresses != null && addresses.isNotEmpty()) {
                 val destination = LatLng(addresses[0].latitude, addresses[0].longitude)
-                showRouteToDestination(destination)
+                if (isLocationWithinBounds(destination)) {
+                    showRouteToDestination(destination)
+                } else {
+                    Snackbar.make(findViewById(R.id.mapFragment), "Destination is outside Tagum City", Snackbar.LENGTH_LONG).show()
+                }
             } else {
                 Snackbar.make(findViewById(R.id.mapFragment), "Location not found", Snackbar.LENGTH_LONG).show()
             }
@@ -132,6 +143,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             Snackbar.make(findViewById(R.id.mapFragment), "Error finding location", Snackbar.LENGTH_LONG).show()
         }
     }
+
+    private fun isLocationWithinBounds(location: LatLng): Boolean {
+        val tagumCityBounds = LatLngBounds(
+            LatLng(7.4135, 125.8090), // Southwest corner of Tagum City
+            LatLng(7.4702, 125.8295)  // Northeast corner of Tagum City
+        )
+        return tagumCityBounds.contains(location)
+    }
+
+
 
     private fun showRouteToDestination(destination: LatLng) {
         if (currentLocation != null) {
@@ -147,6 +168,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100))
         }
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

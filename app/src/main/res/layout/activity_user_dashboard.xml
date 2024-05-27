@@ -29,7 +29,7 @@
         android:background="@color/white"
         android:nestedScrollingEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userDisplayName"
@@ -47,10 +47,25 @@
                 android:id="@+id/welcome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="10dp"
                 android:text="Welcome"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold|italic" />
+
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="-39dp"
+                android:layout_marginStart="50dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="start"
+                android:padding="10dp"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold|italic" />
@@ -59,14 +74,13 @@
                 android:id="@+id/findDriver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="10dp"
+                android:layout_marginTop="50dp"
                 android:text="Find nearby Drivers"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold|italic" />
-
 
 
             <SearchView
@@ -101,17 +115,17 @@
             <ImageView
                 android:id="@+id/driverphoto"
                 android:layout_width="match_parent"
-                android:layout_gravity="end"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:src="@drawable/driverphoto" />
 
             <TextView
                 android:id="@+id/nameDriver"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="start"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="-5dp"
-                android:layout_gravity="start"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="10dp"
                 android:text="Ebrahim Diangca"
@@ -123,9 +137,9 @@
                 android:id="@+id/gmall"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="start"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="-15sp"
-                android:layout_gravity="start"
                 android:fontFamily="sans-serif-smallcaps"
                 android:padding="10dp"
                 android:text="Gmall Tagum"
@@ -138,11 +152,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
-                android:gravity="center"
                 android:layout_marginStart="300dp"
                 android:layout_marginTop="-50dp"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/black"
+                android:gravity="center"
                 android:text="Book" />
 
             <ImageView
@@ -184,12 +198,12 @@
                 android:id="@+id/book1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="300dp"
                 android:layout_gravity="end"
-                android:gravity="center"
+                android:layout_marginStart="300dp"
                 android:layout_marginTop="-50dp"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/black"
+                android:gravity="center"
                 android:text="Book" />
 
 
