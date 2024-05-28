@@ -26,6 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+
     private lateinit var mGoogleMap: GoogleMap
     private lateinit var binding: ActivityMapBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient

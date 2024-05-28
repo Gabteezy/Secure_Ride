@@ -48,7 +48,7 @@ class BookingDetails : AppCompatActivity() {
             Toast.makeText(this, "4:00pm selected", Toast.LENGTH_SHORT).show()
         }
 
-        binding.confirm.setOnClickListener {
+        binding.btnConfirm.setOnClickListener {
             startActivity(Intent(this@BookingDetails, MapActivity::class.java))
         }
     }
