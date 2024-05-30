@@ -43,7 +43,7 @@ class UserRegister : AppCompatActivity() {
 
             val email = binding.email.text.toString()
             val confirmPassword = binding.confirmPassword.text.toString()
-            val password = binding.passWord.text.toString()
+            val password = binding.password.text.toString()
             val firstName = binding.firstName.text.toString()
             val lastName = binding.lastName.text.toString()
             val phone = binding.phone.text.toString()
@@ -63,7 +63,7 @@ class UserRegister : AppCompatActivity() {
                     binding.phone.error = "Please enter your Phone!"
                 }
                 if (password.isEmpty()) {
-                    binding.passWord.error = "Please enter your Password!"
+                    binding.password.error = "Please enter your Password!"
                 }
                 if (confirmPassword.isEmpty()) {
                     binding.confirmPassword.error = "Please confirm your Password!"
@@ -152,7 +152,7 @@ class UserRegister : AppCompatActivity() {
                             Log.d(
                                 "REGISTER", it.exception!!.message.toString()
                             )
-                            binding.passWord.error = it.exception!!.message.toString()
+                            binding.password.error = it.exception!!.message.toString()
                             Toast.makeText(
                                 this@UserRegister,
                                 it.exception!!.message,
