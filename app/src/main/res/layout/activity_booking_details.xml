@@ -141,7 +141,7 @@
                     android:fontFamily="sans-serif-smallcaps"
                     android:gravity="center"
                     android:padding="20dp"
-                    android:text="Confirm"
+                    android:text="Confirm Booking"
                     android:textAlignment="center"
                     android:textColor="@color/black"
                     android:textSize="10sp"

@@ -4,16 +4,17 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.aces.capstone.secureride.databinding.ActivityAccountBinding
 import com.aces.capstone.secureride.databinding.ActivityProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class Profile : AppCompatActivity() {
+class Account : AppCompatActivity() {
 
     private lateinit var userType: String
     private lateinit var user: UserData
-    private lateinit var binding: ActivityProfileBinding
+    private lateinit var binding: ActivityAccountBinding
     private lateinit var bundle: Bundle
     private var firebaseDatabaseReference: DatabaseReference = FirebaseDatabase.getInstance()
         .getReferenceFromUrl("https://ride-e16d9-default-rtdb.firebaseio.com/")
@@ -21,7 +22,7 @@ class Profile : AppCompatActivity() {
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityProfileBinding.inflate(layoutInflater)
+        binding = ActivityAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Initialize bundle and retrieve user type if it exists
@@ -30,20 +31,11 @@ class Profile : AppCompatActivity() {
         Log.d("PROFILE", "FETCH EXTRA USER TYPE: $userType")
 
         retrieveUserDetails()
-        binding.btnAccount.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             // Handle button click event, for example, navigate to Account activity
-            startActivity(Intent(this, Account::class.java))
-        }
-        binding.btnAbout.setOnClickListener {
-            startActivity(Intent(this, About::class.java))
-        }
-        binding.btnPrivacy.setOnClickListener {
-            startActivity(Intent(this, Privacy::class.java))
-        }
-        binding.btnLogout.setOnClickListener {
-            startActivity(Intent(this, LogoutPrompt::class.java))
-        }
+            startActivity(Intent(this, Profile::class.java))
 
+        }
     }
 
 
@@ -60,8 +52,8 @@ class Profile : AppCompatActivity() {
                     Log.d("DASHBOARD", " USER FOUND \n ${user.toString()}")
                     //bundle = Bundle()
                     //bundle.putParcelable("user", user)
-                    binding.nameTextView.text = "${user.firstname} ${user.lastname}"
-
+                    binding.btnAccount.text = "${user.firstname} ${user.lastname}"
+                    binding.btnEmail.text = "${user.email}"
                 }
             } else {
                 Log.d("USER_DETAILS_NOT_FOUND", "USER NOT FOUND")

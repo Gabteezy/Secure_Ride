@@ -1,72 +1,93 @@
 package com.aces.capstone.secureride
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.aces.capstone.secureride.databinding.ActivityDriverNotificationBinding
-import com.aces.capstone.secureride.model.BookingRequest
+import com.aces.capstone.secureride.model.Booking
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.*
 
 class DriverNotification : AppCompatActivity() {
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
-    private val TAG = "DriverNotification"
-    private lateinit var binding: ActivityDriverNotificationBinding
+    private lateinit var database: FirebaseDatabase
+    private lateinit var auth: FirebaseAuth
+    private lateinit var notificationTextView: TextView
+    private lateinit var btnAccept: Button
+    private lateinit var btnDecline: Button
+
+    private var currentBookingId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityDriverNotificationBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_driver_notification)
 
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            Log.d(TAG, "Current user UID: ${currentUser.uid}")
-            listenForBookingRequests(currentUser.uid)
-        } else {
-            Log.w(TAG, "No authenticated user found")
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+
+        notificationTextView = findViewById(R.id.notification)
+        btnAccept = findViewById(R.id.btnAccept)
+        btnDecline = findViewById(R.id.btnDecline)
+
+        listenForBookings()
+
+        btnAccept.setOnClickListener {
+            currentBookingId?.let { bookingId ->
+                acceptBooking(bookingId)
+            }
+        }
+
+        btnDecline.setOnClickListener {
+            Toast.makeText(this, "Booking Declined", Toast.LENGTH_SHORT).show()
+            currentBookingId = null
+            notificationTextView.text = "No booking requests."
         }
     }
 
-    private fun listenForBookingRequests(driverId: String) {
-        db.collection("bookingRequests")
-            .whereEqualTo("driverId", driverId)
-            .addSnapshotListener { snapshots, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
+    private fun listenForBookings() {
+        val bookingsRef = database.reference.child("bookings")
 
-                if (snapshots != null && !snapshots.isEmpty) {
-                    Log.d(TAG, "Booking requests snapshot received")
-                    for (dc in snapshots.documentChanges) {
-                        when (dc.type) {
-                            DocumentChange.Type.ADDED -> {
-                                val bookingRequest = dc.document.toObject(BookingRequest::class.java)
-                                Log.d(TAG, "New booking request: $bookingRequest")
-                                displayNotification(bookingRequest)
-                            }
-                            DocumentChange.Type.MODIFIED -> {
-                                Log.d(TAG, "Modified booking request")
-                            }
-                            DocumentChange.Type.REMOVED -> {
-                                Log.d(TAG, "Removed booking request")
-                            }
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "No new booking requests")
-                }
+        bookingsRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                handleBooking(snapshot)
             }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                handleBooking(snapshot)
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@DriverNotification, "Failed to listen for bookings", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    private fun displayNotification(bookingRequest: BookingRequest) {
-        binding.notification.text = " Commuter: ${bookingRequest.commuterId}\n" +
-                    " FirstName: ${bookingRequest.firstname}\n" +
-                    " Pickup: ${bookingRequest.pickupLocation}\n" +
-                    " Dropoff: ${bookingRequest.dropoffLocation}\n" +
-                    " Time: ${bookingRequest.timeSlot}\n" +
-                    " Date: ${bookingRequest.date}"
+    private fun handleBooking(snapshot: DataSnapshot) {
+        val booking = snapshot.getValue(Booking::class.java)
+        if (booking != null && booking.driverId == null) {
+            currentBookingId = snapshot.key
+            notificationTextView.text = "New booking request:\nPickup: ${booking.details?.get("pickup")}\nDestination: ${booking.details?.get("destination")}\nTime: ${booking.details?.get("time")}\nDate: ${booking.details?.get("date")}"
+            Toast.makeText(this, "New booking request available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun acceptBooking(bookingId: String) {
+        val driverId = auth.currentUser?.uid
+
+        if (driverId != null) {
+            database.reference.child("bookings").child(bookingId).child("driverId").setValue(driverId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Booking Accepted", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@DriverNotification, MapsActivity::class.java))
+                } else {
+                    Toast.makeText(this, "Failed to accept booking", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "No authenticated user found", Toast.LENGTH_SHORT).show()
+        }
     }
 }

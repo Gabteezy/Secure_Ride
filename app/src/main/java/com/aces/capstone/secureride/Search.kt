@@ -38,6 +38,11 @@ class Search : AppCompatActivity() {
                     startActivity(Intent(this@Search, BookingDetails::class.java))
                     true
                 }
+                R.id.navCustomerProfile -> {
+                    // Navigate to Map activity
+                    startActivity(Intent(this@Search, Profile::class.java))
+                    true
+                }
                 else -> false
             }
         }

@@ -3,4 +3,5 @@
     <string name="app_client_id">508548829715-7npout2gevg50eh3nut5m5tju6p0i8eg.apps.googleusercontent.com</string>
     <string name="google_map_api_key">AIzaSyDvHaSdRV_dqnHkcK7SA6RYXyKRS8yu8to</string>
     <string name="item_label">Numbers</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

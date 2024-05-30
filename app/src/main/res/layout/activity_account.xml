@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Profile">
+    tools:context=".Account">
 
     <TextView
         android:id="@+id/btnBack"
@@ -62,17 +62,6 @@
                 android:src="@drawable/vector_profile" />
 
 
-            <TextView
-                android:id="@+id/nameTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:text="Raymound Clarin"
-                android:textSize="20dp"
-                android:textStyle="bold|italic" />
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -83,7 +72,7 @@
 
 
 
-                <androidx.appcompat.widget.AppCompatButton
+                <TextView
                     android:id="@+id/btnAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -93,58 +82,54 @@
                     android:layout_marginTop="30dp"
                     android:paddingEnd="20dp"
                     android:drawableStart="@drawable/vector_account"
-                    android:drawableEnd="@drawable/vector_arrow"
                     android:drawablePadding="10dp"
                     android:gravity="start|center_vertical"
-                    android:text="Account"
+                    android:text="Name"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnPrivacy"
+                <TextView
+                    android:id="@+id/btnEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:paddingStart="20dp"
                     android:padding="20dp"
                     android:paddingEnd="20dp"
-                    android:drawableStart="@drawable/vector_security"
-                    android:drawableEnd="@drawable/vector_arrow"
+                    android:drawableStart="@drawable/vector_email"
                     android:drawablePadding="10dp"
                     android:gravity="start|center_vertical"
-                    android:text="Privacy and Security"
+                    android:text="Email"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnAbout"
+                <TextView
+                    android:id="@+id/btnAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:paddingStart="20dp"
                     android:padding="20dp"
                     android:paddingEnd="20dp"
-                    android:drawableStart="@drawable/vector_about"
-                    android:drawableEnd="@drawable/vector_arrow"
+                    android:drawableStart="@drawable/vector_address"
                     android:drawablePadding="10dp"
                     android:gravity="start|center_vertical"
-                    android:text="About"
+                    android:text="Address"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnLogout"
+                <TextView
+                    android:id="@+id/btnPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:paddingStart="20dp"
                     android:padding="20dp"
                     android:paddingEnd="20dp"
-                    android:drawableStart="@drawable/vector_logout"
-                    android:drawableEnd="@drawable/vector_arrow"
+                    android:drawableStart="@drawable/vector_password"
                     android:drawablePadding="10dp"
                     android:gravity="start|center_vertical"
-                    android:text="Logout"
+                    android:text="Password"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
