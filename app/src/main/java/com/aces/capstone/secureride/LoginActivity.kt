@@ -18,8 +18,11 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Access the button via binding
-        binding.btnStarted.setOnClickListener {
+        binding.btnLogin.setOnClickListener {
             startActivity(Intent(this@LoginActivity, LoginUser::class.java))
+        }
+        binding.btnSignup.setOnClickListener {
+            startActivity(Intent(this@LoginActivity, RegisterAs::class.java))
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.aces.capstone.secureride.databinding.ActivityAccountBinding
-import com.aces.capstone.secureride.databinding.ActivityProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -31,11 +30,6 @@ class Account : AppCompatActivity() {
         Log.d("PROFILE", "FETCH EXTRA USER TYPE: $userType")
 
         retrieveUserDetails()
-        binding.btnBack.setOnClickListener {
-            // Handle button click event, for example, navigate to Account activity
-            startActivity(Intent(this, Profile::class.java))
-
-        }
     }
 
 

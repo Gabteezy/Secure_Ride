@@ -1,4 +1,5 @@
 
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,7 +12,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:nestedScrollingEnabled="true"
         tools:ignore="MissingConstraints">
 
@@ -29,24 +30,36 @@
                 android:id="@+id/btnCommuter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="300dp"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_button"
+                android:gravity="center"
                 android:text="Register as Commuter"
-                android:backgroundTint="@color/yellow"
+                android:backgroundTint="@color/green"
                 android:textSize="16sp"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnDriver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
                 android:text="Register as Driver"
-                android:backgroundTint="@color/yellow"
+                android:background="@drawable/rounded_button"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:backgroundTint="@color/green"
                 android:textSize="16sp"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnAdmin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
                 android:text="Register as Admin"
-                android:backgroundTint="@color/yellow"
+                android:background="@drawable/rounded_button"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:backgroundTint="@color/green"
                 android:textSize="16sp" />
 
             <ProgressBar

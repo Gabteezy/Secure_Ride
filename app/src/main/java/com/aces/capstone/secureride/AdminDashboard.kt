@@ -17,8 +17,8 @@ class AdminDashboard : AppCompatActivity() {
         setContentView(binding.root)
 
         // Access the button via binding
-        binding.logout.setOnClickListener {
-            startActivity(Intent(this@AdminDashboard, LogoutPrompt::class.java))
-        }
+//        binding.logout.setOnClickListener {
+//            startActivity(Intent(this@AdminDashboard, LogoutPrompt::class.java))
+//        }
     }
     }
