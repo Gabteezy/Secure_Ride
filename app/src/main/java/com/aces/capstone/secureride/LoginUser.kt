@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import android.util.Patterns
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.aces.capstone.secureride.databinding.ActivityLoginUserBinding
@@ -25,14 +24,12 @@ import com.google.firebase.database.*
 class LoginUser : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginUserBinding
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var googleSignInClient: GoogleSignInClient
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private var firebaseDatabaseReference: DatabaseReference = FirebaseDatabase.getInstance()
         .getReferenceFromUrl("https://ride-e16d9-default-rtdb.firebaseio.com/")
     private lateinit var credential: AuthCredential
     private var userType = "UNKNOWN"
-    private lateinit var userName: String
 
     companion object {
         private const val TAG = "LoginUser"
@@ -43,8 +40,6 @@ class LoginUser : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        firebaseAuth = FirebaseAuth.getInstance()
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.app_client_id))
@@ -58,12 +53,12 @@ class LoginUser : AppCompatActivity() {
 
     private fun setupButtonClickListeners() {
         binding.registerAs.setOnClickListener {
-            startActivity(Intent(this@LoginUser, RegisterAs::class.java))
+            startActivity(Intent(this, RegisterAs::class.java))
         }
 
         binding.btnLogin.setOnClickListener {
-            val username = binding.username.text.toString()
-            val password = binding.passWord.text.toString()
+            val username = binding.username.text.toString().trim()
+            val password = binding.passWord.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
                 handleEmptyFields()
@@ -91,18 +86,16 @@ class LoginUser : AppCompatActivity() {
     }
 
     private fun signInWithEmailAndPassword(username: String, password: String) {
+        binding.progressBar.visibility = View.VISIBLE // Show progress bar
         firebaseAuth.signInWithEmailAndPassword(username, password)
             .addOnCompleteListener { task ->
+                binding.progressBar.visibility = View.GONE // Hide progress bar
                 if (task.isSuccessful) {
                     Log.d(TAG, "Successfully logged in")
                     checkUserAccount()
                 } else {
                     Log.e(TAG, "Login failed", task.exception)
-                    Toast.makeText(
-                        this,
-                        "Invalid username or password! Please try again!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "Invalid username or password! Please try again!", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -148,8 +141,7 @@ class LoginUser : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val currentUser = firebaseAuth.currentUser
                     if (currentUser != null && snapshot.hasChild(currentUser.uid)) {
-                        userType = snapshot.child(currentUser.uid).child("type").getValue(String::class.java).toString()
-                        userName = "${snapshot.child(currentUser.uid).child("email").getValue(String::class.java)} ${currentUser.uid}"
+                        userType = snapshot.child(currentUser.uid).child("type").getValue(String::class.java) ?: "UNKNOWN"
                         logged(userType)
                     } else {
                         binding.progressBar.visibility = View.GONE
@@ -174,7 +166,6 @@ class LoginUser : AppCompatActivity() {
                 "Admin" -> Intent(this, AdminDashboard::class.java)
                 else -> Intent(this, AdminDashboard::class.java)
             }
-            intent.putExtra("user", userType)
             startActivity(intent)
             finish()
         }, 3000)

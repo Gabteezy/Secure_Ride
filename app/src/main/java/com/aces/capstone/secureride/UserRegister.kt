@@ -81,85 +81,51 @@ class UserRegister : AppCompatActivity() {
                 }
 
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            firebaseDatabaseReference.child("user")
-                                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val userId = firebaseAuth.currentUser?.uid ?: ""
+                            if (userId.isNotEmpty()) {
+                                firebaseDatabaseReference.child("user").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                                     override fun onDataChange(snapshot: DataSnapshot) {
-                                        if (snapshot.hasChild(firebaseAuth.currentUser?.uid ?: "")) {
-                                            Log.d("REGISTER", "$userType is already Registered!")
-                                            Toast.makeText(this@UserRegister, "$userType is already Registered!", Toast.LENGTH_SHORT).show()
+                                        if (snapshot.exists()) {
+                                            Log.d("REGISTER", "$userType is already registered!")
+                                            Toast.makeText(this@UserRegister, "$userType is already registered!", Toast.LENGTH_SHORT).show()
                                         } else {
-                                            val userId = firebaseAuth.currentUser?.uid ?: ""
-                                            if (userId.isNotEmpty()) {
-                                                val databaseRef = firebaseDatabase.reference.child("user").child(userId)
+                                            user = UserData(userId, email, firstName, lastName, phone, password, userType, "false")
+                                            val databaseRef = firebaseDatabase.reference.child("user").child(userId)
 
-                                                user = UserData(
-                                                    userId,
-                                                    email,
-                                                    firstName,
-                                                    lastName,
-                                                    phone,
-                                                    password,
-                                                    userType,
-                                                    false.toString()
-                                                )
+                                            databaseRef.setValue(user).addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Log.d("REGISTER", "$userType has been successfully registered!")
+                                                    Toast.makeText(this@UserRegister, "$userType has been successfully registered!", Toast.LENGTH_SHORT).show()
 
-                                                databaseRef.setValue(user)
-                                                    .addOnCompleteListener { task ->
-                                                        if (task.isSuccessful) {
-                                                            Log.d("REGISTER", "$userType has been successfully Registered!")
-                                                            Toast.makeText(
-                                                                this@UserRegister,
-                                                                "$userType has been successfully Registered!",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-
-                                                            firebaseAuth.signOut()
-                                                            val intent = Intent(this@UserRegister, LoginActivity::class.java)
-                                                            startActivity(intent)
-                                                        } else {
-                                                            Log.e("REGISTER", "Error registering $userType: ${task.exception}")
-                                                            Toast.makeText(
-                                                                this@UserRegister,
-                                                                "Error registering $userType: ${task.exception?.message}",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                    }
-                                            } else {
-                                                Log.e("REGISTER", "Current $userType ID is null or empty.")
-                                                Toast.makeText(this@UserRegister, "Current $userType ID is null or empty.", Toast.LENGTH_SHORT).show()
+                                                    // Sign out and redirect to login
+                                                    firebaseAuth.signOut()
+                                                    startActivity(Intent(this@UserRegister, LoginActivity::class.java))
+                                                    finish() // Call finish to remove the registration activity from the back stack
+                                                } else {
+                                                    Log.e("REGISTER", "Error saving user data: ${task.exception?.message}")
+                                                    Toast.makeText(this@UserRegister, "Error saving user data: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
                                         }
                                     }
 
-
                                     override fun onCancelled(error: DatabaseError) {
-                                        Log.d(
-                                            "REGISTER",
-                                            "Error in Registering due to ${error.message}!"
-                                        )
-                                        Toast.makeText(
-                                            this@UserRegister,
-                                            "Error in Registering due to ${error.message}!",
-                                            Toast.LENGTH_LONG
-                                        )
+                                        Log.e("REGISTER", "Database error: ${error.message}")
+                                        Toast.makeText(this@UserRegister, "Database error: ${error.message}", Toast.LENGTH_LONG).show()
                                     }
-
                                 })
+                            } else {
+                                Log.e("REGISTER", "User ID is null or empty.")
+                                Toast.makeText(this@UserRegister, "User ID is null or empty.", Toast.LENGTH_SHORT).show()
+                            }
                         } else {
-                            Log.d(
-                                "REGISTER", it.exception!!.message.toString()
-                            )
-                            binding.password.error = it.exception!!.message.toString()
-                            Toast.makeText(
-                                this@UserRegister,
-                                it.exception!!.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Log.e("REGISTER", "Registration failed: ${task.exception?.message}")
+                            Toast.makeText(this@UserRegister, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
+
             }
         }
 

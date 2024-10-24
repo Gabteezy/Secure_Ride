@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.aces.capstone.secureride.databinding.ActivityUserDashboardBinding
+import com.aces.capstone.secureride.model.RideRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,8 +21,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import java.io.IOException
 
 class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
@@ -32,6 +33,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var geocoder: Geocoder
     private var googleMap: GoogleMap? = null
     private lateinit var mapFragment: SupportMapFragment
+    private lateinit var auth: FirebaseAuth
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -42,6 +44,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityUserDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        auth = FirebaseAuth.getInstance()
         firebaseDatabaseReference = FirebaseDatabase.getInstance().reference
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geocoder = Geocoder(this)
@@ -138,6 +141,12 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun requestRide() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         // Get the current user location
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -147,25 +156,45 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return
         }
+
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                val rideRequest = mapOf(
-                    "userId" to "someUserId",  // Replace with actual user ID
-                    "latitude" to location.latitude,
-                    "longitude" to location.longitude,
-                    "status" to "pending"
-                )
-                firebaseDatabaseReference.child("ride_requests").push().setValue(rideRequest)
-                Toast.makeText(this, "Ride requested", Toast.LENGTH_SHORT).show()
+                // Retrieve user's first name and last name from the database dynamically
+                val userReference = firebaseDatabaseReference.child("users").child(currentUser.uid)
+                userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val firstName = snapshot.child("firstName").getValue(String::class.java) ?: "Unknown"
+                        val lastName = snapshot.child("lastName").getValue(String::class.java) ?: "Unknown"
+
+                        // Create a ride request with dynamic user details
+                        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").push()
+                        val rideRequest = RideRequest(
+                            userId = currentUser.uid,
+                            id = rideRequestRef.key ?: "",
+                            info = "Requesting a ride",
+                            destination = "User's Destination", // Set this based on user input
+                            firstName = firstName,
+                            lastName = lastName,
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            status = "pending"
+                        )
+                        rideRequestRef.setValue(rideRequest).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this@UserDashboard, "Ride requested successfully!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@UserDashboard, "Failed to send ride request.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@UserDashboard, "Failed to retrieve user details", Toast.LENGTH_SHORT).show()
+                        Log.e("Firebase", "Error retrieving user data: ${error.message}")
+                    }
+                })
             } else {
                 Toast.makeText(this, "Unable to get your location", Toast.LENGTH_SHORT).show()
             }

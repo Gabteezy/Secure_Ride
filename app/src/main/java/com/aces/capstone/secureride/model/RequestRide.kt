@@ -5,14 +5,19 @@ import android.os.Parcelable
 
 data class RideRequest(
     val userId: String? = "",
+    var id: String? = "",
+    val info: String? = "",
+    val destination: String? = "",
+    val firstName: String? = "",
+    val lastName: String? = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val status: String? = ""
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
-        parcel.readDouble(),
-        parcel.readDouble(),
+        parcel.readString(),
+        parcel.readString(),
         parcel.readString()
     ) {
     }
