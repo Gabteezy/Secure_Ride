@@ -1,66 +1,56 @@
-package com.aces.capstone.secureride
+package com.aces.capstone.secureride.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.aces.capstone.secureride.R
 import com.aces.capstone.secureride.model.RideRequest
-import com.google.firebase.database.FirebaseDatabase
 
-class RideRequestAdapter : RecyclerView.Adapter<RideRequestAdapter.RideRequestViewHolder>() {
-    private val rideRequests = mutableListOf<RideRequest>()
+class RideRequestAdapter(
+    private val rideRequests: List<RideRequest>,
+    private val onAcceptClicked: (RideRequest) -> Unit,
+    private val onDeclineClicked: (RideRequest) -> Unit // Added decline callback
+) : RecyclerView.Adapter<RideRequestAdapter.ViewHolder>() {
 
-    fun addRideRequest(rideRequest: RideRequest) {
-        rideRequests.add(rideRequest)
-        notifyItemInserted(rideRequests.size - 1)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RideRequestViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.ride_request_item, parent, false)
-        return RideRequestViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: RideRequestViewHolder, position: Int) {
-        val rideRequest = rideRequests[position]
-        holder.bind(rideRequest)
-    }
-
-    override fun getItemCount() = rideRequests.size
-
-    class RideRequestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val firstNameTextView: TextView = itemView.findViewById(R.id.firstNameTextView)
-        private val lastNameTextView: TextView = itemView.findViewById(R.id.lastNameTextView)
-        private val destinationTextView: TextView = itemView.findViewById(R.id.destinationTextView)
-        private val acceptButton: Button = itemView.findViewById(R.id.acceptButton)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Initialize your TextViews
+        val nameTextView: TextView = itemView.findViewById(R.id.nameTextView)
+        val locationTextView: TextView = itemView.findViewById(R.id.locationTextView)
+        val acceptButton: TextView = itemView.findViewById(R.id.acceptButton)
+        val declineButton: TextView = itemView.findViewById(R.id.declineButton)
 
         fun bind(rideRequest: RideRequest) {
-            firstNameTextView.text = rideRequest.firstName
-            lastNameTextView.text = rideRequest.lastName
-            destinationTextView.text = rideRequest.destination
+            // Bind the data to your views
+            nameTextView.text = "${rideRequest.firstName} ${rideRequest.lastName}"
+            locationTextView.text = "Location: ${rideRequest.latitude}, ${rideRequest.longitude}"
 
-            // Show "Accept" button only if the status is "pending"
-            if (rideRequest.status == "pending") {
-                acceptButton.visibility = View.VISIBLE
-            } else {
-                acceptButton.visibility = View.GONE
+            // Example condition: Change text color if name is "John Doe"
+            if (nameTextView.text == "John Doe") {
+                nameTextView.setTextColor(itemView.context.getColor(android.R.color.holo_red_dark))
             }
 
-            // Handle the "Accept" button click
             acceptButton.setOnClickListener {
-                acceptRideRequest(rideRequest)
+                onAcceptClicked(rideRequest)
             }
-        }
 
-        private fun acceptRideRequest(rideRequest: RideRequest) {
-            // Update the ride request status in Firebase to "accepted"
-            val rideRequestId = rideRequest.id
-            if (rideRequestId != null) {
-                val firebaseDatabaseReference = FirebaseDatabase.getInstance().reference
-                firebaseDatabaseReference.child("ride_requests").child(rideRequestId)
-                    .child("status").setValue("accepted")
+            declineButton.setOnClickListener {
+                onDeclineClicked(rideRequest)
             }
         }
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.ride_request_item, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val rideRequest = rideRequests[position]
+        holder.bind(rideRequest) // This sets the name and location text
+    }
+
+    override fun getItemCount(): Int = rideRequests.size
 }

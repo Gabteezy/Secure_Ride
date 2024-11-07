@@ -50,7 +50,8 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         geocoder = Geocoder(this)
 
         // Initialize the map fragment
-        mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
+        mapFragment =
+            supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         // Handle search button click
@@ -71,10 +72,86 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         binding.getRideButton.setOnClickListener {
             requestRide()
         }
+
+        listenForRideStatusUpdates()
     }
 
+    private fun requestRide() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val userReference = firebaseDatabaseReference.child("users").child(currentUser.uid)
+                userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val firstName = snapshot.child("firstName").getValue(String::class.java) ?: "Unknown"
+                        val lastName = snapshot.child("lastName").getValue(String::class.java) ?: "Unknown"
+
+                        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").push()
+                        val rideRequest = RideRequest(
+                            userId = currentUser.uid,
+                            id = rideRequestRef.key ?: "",
+                            info = "Requesting a ride",
+                            destination = "User's Destination", // Use actual user input for destination
+                            firstName = firstName,
+                            lastName = lastName,
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            status = "pending"
+                        )
+
+                        // Set a marker on the map at the user's location
+                        setRideLocationMarker(LatLng(location.latitude, location.longitude))
+
+                        rideRequestRef.setValue(rideRequest).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this@UserDashboard, "Ride requested successfully!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@UserDashboard, "Failed to send ride request.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@UserDashboard, "Failed to retrieve user details", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            } else {
+                Toast.makeText(this, "Unable to get your location", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setRideLocationMarker(location: LatLng) {
+        googleMap?.apply {
+            clear() // Clear any previous markers
+            addMarker(MarkerOptions().position(location).title("Ride Location"))
+            moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+        }
+    }
+
+
     private fun enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             googleMap?.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
@@ -83,11 +160,19 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -129,7 +214,8 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
                         moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
                     }
                 } else {
-                    Toast.makeText(this, "Location is outside Tagum City", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Location is outside Tagum City", Toast.LENGTH_SHORT)
+                        .show()
                 }
             } else {
                 Toast.makeText(this, "No location found for \"$query\"", Toast.LENGTH_SHORT).show()
@@ -140,64 +226,37 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun requestRide() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        // Get the current user location
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                // Retrieve user's first name and last name from the database dynamically
-                val userReference = firebaseDatabaseReference.child("users").child(currentUser.uid)
-                userReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val firstName = snapshot.child("firstName").getValue(String::class.java) ?: "Unknown"
-                        val lastName = snapshot.child("lastName").getValue(String::class.java) ?: "Unknown"
-
-                        // Create a ride request with dynamic user details
-                        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").push()
-                        val rideRequest = RideRequest(
-                            userId = currentUser.uid,
-                            id = rideRequestRef.key ?: "",
-                            info = "Requesting a ride",
-                            destination = "User's Destination", // Set this based on user input
-                            firstName = firstName,
-                            lastName = lastName,
-                            latitude = location.latitude,
-                            longitude = location.longitude,
-                            status = "pending"
-                        )
-                        rideRequestRef.setValue(rideRequest).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(this@UserDashboard, "Ride requested successfully!", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(this@UserDashboard, "Failed to send ride request.", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+    private fun listenForRideStatusUpdates() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val rideRequestRef =
+                firebaseDatabaseReference.child("ride_requests").orderByChild("userId")
+                    .equalTo(currentUser.uid)
+            rideRequestRef.addChildEventListener(object : ChildEventListener {
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    val rideRequest = snapshot.getValue(RideRequest::class.java)
+                    if (rideRequest != null && rideRequest.status == "accepted") {
+                        Toast.makeText(
+                            this@UserDashboard,
+                            "Your ride has been accepted!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(this@UserDashboard, "Failed to retrieve user details", Toast.LENGTH_SHORT).show()
-                        Log.e("Firebase", "Error retrieving user data: ${error.message}")
-                    }
-                })
-            } else {
-                Toast.makeText(this, "Unable to get your location", Toast.LENGTH_SHORT).show()
-            }
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onChildRemoved(snapshot: DataSnapshot) {}
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(
+                        this@UserDashboard,
+                        "Error: ${error.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
         }
     }
 }

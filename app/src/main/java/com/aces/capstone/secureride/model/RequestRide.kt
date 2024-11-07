@@ -12,10 +12,19 @@ data class RideRequest(
     val lastName: String? = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val status: String? = ""
+    var status: String? = "pending",
+    var driverId: String? = "",
+    var driverName: String? = ""
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readDouble(),
+        parcel.readDouble(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString()
@@ -24,9 +33,16 @@ data class RideRequest(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(userId)
+        parcel.writeString(id)
+        parcel.writeString(info)
+        parcel.writeString(destination)
+        parcel.writeString(firstName)
+        parcel.writeString(lastName)
         parcel.writeDouble(latitude)
         parcel.writeDouble(longitude)
         parcel.writeString(status)
+        parcel.writeString(driverId)
+        parcel.writeString(driverName)
     }
 
     override fun describeContents(): Int {
