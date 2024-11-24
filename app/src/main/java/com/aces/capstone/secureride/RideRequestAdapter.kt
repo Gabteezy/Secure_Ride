@@ -3,6 +3,7 @@ package com.aces.capstone.secureride.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aces.capstone.secureride.R
@@ -15,21 +16,18 @@ class RideRequestAdapter(
 ) : RecyclerView.Adapter<RideRequestAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Initialize your TextViews
         val nameTextView: TextView = itemView.findViewById(R.id.nameTextView)
-        val locationTextView: TextView = itemView.findViewById(R.id.locationTextView)
-        val acceptButton: TextView = itemView.findViewById(R.id.acceptButton)
-        val declineButton: TextView = itemView.findViewById(R.id.declineButton)
+        val pickupLocationTextView: TextView = itemView.findViewById(R.id.pickupLocationTextView)
+        val dropoffLocationTextView: TextView = itemView.findViewById(R.id.dropoffLocationTextView)
+        val totalFareTextView: TextView = itemView.findViewById(R.id.totalFareTextView)
+        val acceptButton: Button = itemView.findViewById(R.id.acceptButton)
+        val declineButton: Button = itemView.findViewById(R.id.declineButton)
 
         fun bind(rideRequest: RideRequest) {
-            // Bind the data to your views
             nameTextView.text = "${rideRequest.firstName} ${rideRequest.lastName}"
-            locationTextView.text = "Location: ${rideRequest.latitude}, ${rideRequest.longitude}"
-
-            // Example condition: Change text color if name is "John Doe"
-            if (nameTextView.text == "John Doe") {
-                nameTextView.setTextColor(itemView.context.getColor(android.R.color.holo_red_dark))
-            }
+            pickupLocationTextView.text = "Pickup Location: ${rideRequest.pickupLocation}"
+            dropoffLocationTextView.text = "Dropoff Location: ${rideRequest.dropoffLocation}"
+            totalFareTextView.text = "PHP ${rideRequest.totalFare}" // Display the fare
 
             acceptButton.setOnClickListener {
                 onAcceptClicked(rideRequest)
@@ -49,7 +47,7 @@ class RideRequestAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val rideRequest = rideRequests[position]
-        holder.bind(rideRequest) // This sets the name and location text
+        holder.bind(rideRequest) // Bind the ride request data to the views
     }
 
     override fun getItemCount(): Int = rideRequests.size

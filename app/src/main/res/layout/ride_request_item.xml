@@ -1,54 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:background="@color/background_history">
 
+    <!-- Top bar with countdown timer -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/yellow"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_booking_alert" />
+
+        <TextView
+            android:id="@+id/incomingBookingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Incoming Booking"
+            android:paddingStart="12dp"
+            android:layout_gravity="center"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/timerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ends in 14 sec"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- Ride information -->
+    <LinearLayout
+        android:id="@+id/rideInfoLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@color/background_history"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Ride details -->
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Name"
             android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="20sp"
+            android:textColor="@android:color/holo_blue_dark"/>
 
         <TextView
-            android:id="@+id/locationTextView"
+            android:id="@+id/rideInfoTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Location: 7.422, 125.757"
-            android:textSize="14sp" />
+            android:text="Nov 11 (Mon) 03:27 PM                     JR#12411119558049395"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
 
+        <!-- Distance info -->
+<!--        <TextView-->
+<!--            android:id="@+id/distanceTextView"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="0.7 KM away from you"-->
+<!--            android:textSize="16sp"-->
+<!--            android:layout_marginTop="8dp"/>-->
+
+        <!-- Pickup and dropoff locations -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <!-- Pickup location -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="@drawable/rounded_background">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_location" />
+
+                <TextView
+                    android:id="@+id/pickupLocationTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="4 Cattleya, Marilao, Bulacan, Philippines"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Dropoff location -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="@drawable/rounded_background"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/round_icon_background" />
+
+                <TextView
+                    android:id="@+id/dropoffLocationTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="SM Clark, Clark Freeport, Angeles, Pampanga, Philippines"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Earnings section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="16dp">
 
             <TextView
-                android:id="@+id/acceptButton"
-                android:layout_width="0dp"
+                android:id="@+id/cashToCollectLabel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Accept Ride"
-                android:textColor="@android:color/holo_blue_dark"
+                android:text="CASH TO COLLECT: "
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center"/>
+                android:textColor="@android:color/holo_red_dark" />
 
             <TextView
-                android:id="@+id/declineButton"
-                android:layout_width="0dp"
+                android:id="@+id/totalFareTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Decline Ride"
-                android:textColor="@android:color/holo_red_dark"
+                android:text="PHP 1,047.00"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center"/>
+                android:textColor="@android:color/holo_red_dark"/>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <!-- Accept and Reject buttons -->
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/rideInfoLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/declineButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Reject"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@android:color/holo_red_dark" />
+
+        <Button
+            android:id="@+id/acceptButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Accept"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@android:color/holo_green_dark" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

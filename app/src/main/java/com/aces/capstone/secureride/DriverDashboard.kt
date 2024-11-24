@@ -75,9 +75,11 @@ class DriverDashboard : AppCompatActivity() {
                 // Manage the visibility of the no requests text view
                 if (rideRequests.isEmpty()) {
                     binding.noRequestsTextView.visibility = View.VISIBLE
+                    binding.historyLogoImageView.visibility = View.VISIBLE
                     binding.rideRequestsRecyclerView.visibility = View.GONE
                 } else {
                     binding.noRequestsTextView.visibility = View.GONE
+                    binding.historyLogoImageView.visibility = View.GONE
                     binding.rideRequestsRecyclerView.visibility = View.VISIBLE
                 }
             }
