@@ -2,57 +2,18 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@color/background_history">
 
-    <!-- Top bar with countdown timer -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/yellow"
-        android:padding="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_booking_alert" />
-
-        <TextView
-            android:id="@+id/incomingBookingLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Incoming Booking"
-            android:paddingStart="12dp"
-            android:layout_gravity="center"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/timerTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ends in 14 sec"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:textSize="16sp"/>
-    </LinearLayout>
 
     <!-- Ride information -->
     <LinearLayout
         android:id="@+id/rideInfoLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/background_history"
         android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -66,13 +27,29 @@
             android:textSize="20sp"
             android:textColor="@android:color/holo_blue_dark"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@drawable/rounded_background">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_clock" />
+
         <TextView
             android:id="@+id/rideInfoTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nov 11 (Mon) 03:27 PM                     JR#12411119558049395"
+            android:paddingStart="8dp"
+            android:text="Nov 11 (Mon) 03:27 PM JR#12411119558049395"
             android:textSize="16sp"
             android:textColor="@color/black"/>
+
+    </LinearLayout>
+
 
         <!-- Distance info -->
 <!--        <TextView-->
@@ -169,7 +146,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintTop_toBottomOf="@id/rideInfoLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -191,7 +168,7 @@
             android:layout_weight="1"
             android:text="Accept"
             android:textColor="@android:color/white"
-            android:backgroundTint="@android:color/holo_green_dark" />
+            android:backgroundTint="@color/textSecondary" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

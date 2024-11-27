@@ -20,14 +20,16 @@ class RideRequestAdapter(
         val pickupLocationTextView: TextView = itemView.findViewById(R.id.pickupLocationTextView)
         val dropoffLocationTextView: TextView = itemView.findViewById(R.id.dropoffLocationTextView)
         val totalFareTextView: TextView = itemView.findViewById(R.id.totalFareTextView)
+        val rideInfoTextView: TextView = itemView.findViewById(R.id.rideInfoTextView)
         val acceptButton: Button = itemView.findViewById(R.id.acceptButton)
         val declineButton: Button = itemView.findViewById(R.id.declineButton)
 
         fun bind(rideRequest: RideRequest) {
-            nameTextView.text = "${rideRequest.firstName} ${rideRequest.lastName}"
-            pickupLocationTextView.text = "Pickup Location: ${rideRequest.pickupLocation}"
-            dropoffLocationTextView.text = "Dropoff Location: ${rideRequest.dropoffLocation}"
-            totalFareTextView.text = "PHP ${rideRequest.totalFare}" // Display the fare
+            nameTextView.text = "Name: ${rideRequest.firstName ?: "N/A"} ${rideRequest.lastName ?: "N/A"}"
+            pickupLocationTextView.text = "Pickup Location: ${rideRequest.pickupLocation ?: "Unknown"}"
+            dropoffLocationTextView.text = "Dropoff Location: ${rideRequest.dropoffLocation ?: "Unknown"}"
+            rideInfoTextView.text = rideRequest.rideInfo ?: "No ride info available"
+            totalFareTextView.text = "PHP ${rideRequest.totalFare ?: 0.0}" // Use default fare if null
 
             acceptButton.setOnClickListener {
                 onAcceptClicked(rideRequest)

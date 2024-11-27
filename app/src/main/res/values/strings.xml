@@ -4,4 +4,8 @@
     <string name="google_map_api_key">AIzaSyCtqDIRBkr9On8xVSqaoAwv4BxzTMxwQ2E</string>
     <string name="item_label">Numbers</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="back" />
+    <string name="edit" />
+    <string name="delete" />
+    <string name="profile_picture" />
 </resources>
