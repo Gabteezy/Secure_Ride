@@ -19,4 +19,5 @@ data class RideRequest(
     val dropoffLocation: String = "",
     val dropOffLatitude: Double = 0.0,
     val dropOffLongitude: Double = 0.0,
+    val confirmationStatus: Boolean = false
 )

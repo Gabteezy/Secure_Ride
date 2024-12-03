@@ -28,13 +28,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.maps.android.PolyUtil
 import org.json.JSONObject
-import com.google.android.gms.maps.model.Marker
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,9 +51,6 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var auth: FirebaseAuth
     private lateinit var driverLocation: LatLng
     private lateinit var riderLocation: LatLng
-
-    private var commuterMarker: Marker? = null
-
     private var driverMarker: Marker? = null
     private var destinationLatitude: Double? = null
     private var destinationLongitude: Double? = null
@@ -108,21 +105,29 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 val address = addressList[0]
                 val latLng = LatLng(address.latitude, address.longitude)
-
-                // Set a marker for the searched location
                 googleMap?.addMarker(MarkerOptions().position(latLng).title(locationName))
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-
-                // Save the destination coordinates
                 destinationLatitude = address.latitude
                 destinationLongitude = address.longitude
+
+                // Save the searched location to Firebase
+                val currentUser  = auth.currentUser
+                if (currentUser  != null) {
+                    val searchedLocationRef = firebaseDatabaseReference.child("searched_locations").child(currentUser .uid)
+                    searchedLocationRef.setValue(latLng).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this, "Searched location saved successfully.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Failed to save searched location.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(this, "Error finding location", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     private fun requestRide() {
         val currentUser  = auth.currentUser
@@ -228,7 +233,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
                 }
-                handler.postDelayed(this, 5000) // Update every 5 seconds
+                handler.postDelayed(this, 1000) // Update every 1 seconds
             }
         }
         handler.post(runnable)
@@ -259,24 +264,14 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         googleMap = map
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap?.isMyLocationEnabled = true // Enable My Location layer
+            googleMap?.isMyLocationEnabled = true
 
-            // Get user's current location and place a marker
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    setRideLocationMarker(userLatLng) // Set marker for user's location
-                }
-            }
-
-            if (::driverLocation.isInitialized && ::riderLocation.isInitialized) {
-                requestDirections(driverLocation, riderLocation)
-            }
+            // Start listening for driver location updates once the map is ready
+            listenForDriverLocationUpdates()
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
         }
     }
-
 
     private fun requestDirections(origin: LatLng, destination: LatLng) {
         val apiKey = getString(R.string.google_map_api_key)
@@ -301,27 +296,6 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         googleMap?.addPolyline(PolylineOptions().addAll(pointsList).color(Color.RED))
     }
 
-
-    private fun setDriverMarker(driverLocation: LatLng) {
-        // Check if driverMarker already exists. If it does, just update its position.
-        if (driverMarker == null) {
-            // If the marker doesn't exist, create a new one.
-            driverMarker = googleMap?.addMarker(
-                MarkerOptions()
-                    .position(driverLocation)
-                    .title("Driver Location")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)) // Optional: Customize marker icon color
-            )
-        } else {
-            // If the marker exists, update its position.
-            driverMarker?.position = driverLocation
-        }
-
-        // Move the camera to the driver's location.
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(driverLocation, 15f))
-    }
-
-
     private fun listenForDriverLocationUpdates() {
         val driverId = intent.getStringExtra("driverId") ?: return
         val driverLocationRef = firebaseDatabaseReference.child("driver_locations").child(driverId)
@@ -333,7 +307,23 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
 
                 if (lat != null && lon != null) {
                     driverLocation = LatLng(lat, lon)
-                    setDriverMarker(driverLocation) // Set or update the driver's marker
+
+                    // Check if the driver marker already exists
+                    if (driverMarker == null) {
+                        // Create a new marker for the driver's location
+                        driverMarker = googleMap?.addMarker(
+                            MarkerOptions()
+                                .position(driverLocation)
+                                .title("Driver Location")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)) // Blue marker for driver
+                        )
+                    } else {
+                        // Update the position of the existing marker
+                        driverMarker?.position = driverLocation
+                    }
+
+                    // Optionally, move the camera to focus on the driver's location
+                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(driverLocation, 15f))
                 }
             }
 

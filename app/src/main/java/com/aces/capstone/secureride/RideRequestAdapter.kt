@@ -16,7 +16,7 @@ class RideRequestAdapter(
 ) : RecyclerView.Adapter<RideRequestAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTextView: TextView = itemView.findViewById(R.id.nameTextView)
+        val nameTextView: TextView = itemView.findViewById(R.id.contactNameTextView)
         val pickupLocationTextView: TextView = itemView.findViewById(R.id.pickupLocationTextView)
         val dropoffLocationTextView: TextView = itemView.findViewById(R.id.dropoffLocationTextView)
         val totalFareTextView: TextView = itemView.findViewById(R.id.totalFareTextView)
