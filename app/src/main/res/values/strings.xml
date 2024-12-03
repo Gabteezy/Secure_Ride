@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SecureRide</string>
     <string name="app_client_id">249177641825-cbsevbhsjsbavjochhef438rqbpsnnfq.apps.googleusercontent.com</string>
-    <string name="google_map_api_key">AIzaSyCtqDIRBkr9On8xVSqaoAwv4BxzTMxwQ2E</string>
+    <string name="google_map_api_key">AIzaSyBa_Tf0Sg5a1UD8u0sIVTnAV4O6lGMa5jg</string>
     <string name="item_label">Numbers</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="back" />

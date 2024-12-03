@@ -49,6 +49,8 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
     private var commuterLocationListener: ValueEventListener? = null
     private var rideRequestId: String? = null
     private var commuterMarker: Marker? = null
+    private var driverMarker: Marker? = null
+
     private var destinationLatitude: Double? = null
     private var destinationLongitude: Double? = null
 
@@ -131,15 +133,17 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
                 // Show Commuter's Marker
                 setCommuterMarker(commuterLocation)
 
-                // Show Drop-off Marker
-                setDropOffMarker(commuterDropOffLocation)
-
+                // Set Driver Marker (ensure you have the driver location)
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                         if (location != null) {
                             val driverLocation = LatLng(location.latitude, location.longitude)
+                            setDriverMarker(driverLocation) // Set driver marker
                             requestDirections(driverLocation, commuterLocation) // Draw polyline from driver to commuter
                             requestDirections(commuterLocation, commuterDropOffLocation) // Draw polyline from commuter to drop-off
+
+                            // Call setDropOffMarker to set the drop-off location marker
+                            setDropOffMarker(commuterDropOffLocation)
                         } else {
                             Toast.makeText(this, "Unable to get driver's location", Toast.LENGTH_SHORT).show()
                         }
@@ -185,15 +189,25 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
 //    }
 
     private fun setCommuterMarker(commuterLocation: LatLng) {
-        Log.d("DriverDashboard", "Setting commuter marker at: $commuterLocation")
-        val markerOptions = MarkerOptions().position(commuterLocation).title("Commuter Location")
+        if (commuterMarker != null) {
+            commuterMarker!!.remove() // Remove the existing marker
+        }
+        commuterMarker = googleMap.addMarker(
+            MarkerOptions()
+                .position(commuterLocation)
+                .title("Commuter Location")
+        )
+    }
 
-        // Remove the existing marker if it exists
-        commuterMarker?.remove()
-        commuterMarker = googleMap.addMarker(markerOptions)
-
-        // Move the camera to the commuter's location
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(commuterLocation, 12f))
+    private fun setDriverMarker(driverLocation: LatLng) {
+        if (driverMarker != null) {
+            driverMarker!!.remove() // Remove the existing marker
+        }
+        driverMarker = googleMap.addMarker(
+            MarkerOptions()
+                .position(driverLocation)
+                .title("Driver Location")
+        )
     }
 
     private fun listenForCommuterLocationUpdates(rideRequestId: String) {

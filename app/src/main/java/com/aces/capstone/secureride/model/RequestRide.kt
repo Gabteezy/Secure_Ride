@@ -13,7 +13,7 @@ data class RideRequest(
     val longitude: Double = 0.0,
     var status: String? = "pending",
     val userType: String = "COMMUTER",
-    val totalFare: Double = 0.0,
+    val totalFare: Int = 0,
     val pickupLocation: String = "",
     val rideInfo: String? = "",
     val dropoffLocation: String = "",
