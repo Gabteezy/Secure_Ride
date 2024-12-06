@@ -1,13 +1,17 @@
 package com.aces.capstone.secureride
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
+import android.view.animation.LinearInterpolator
 import android.widget.RatingBar
 import android.widget.SearchView
 import android.widget.Toast
@@ -24,9 +28,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -94,7 +98,12 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
 
         startLocationUpdates()
         listenForRideStatusUpdates()
-        listenForDriverLocationUpdates()
+    }
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        // You can now use googleMap to interact with the map, for example:
+        googleMap.uiSettings.isZoomControlsEnabled = true
+        // other map setup code...
     }
 
     private fun searchLocation(locationName: String) {
@@ -127,6 +136,13 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
             e.printStackTrace()
             Toast.makeText(this, "Error finding location", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun openGoogleMaps(latLng: LatLng) {
+        val uri = "geo:${latLng.latitude},${latLng.longitude}?q=${latLng.latitude},${latLng.longitude}(Location)"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+        intent.setPackage("com.google.android.apps.maps")
+        startActivity(intent)
     }
 
     private fun requestRide() {
@@ -260,78 +276,46 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
+    private fun listenForRideStatusUpdates() {
+        val currentUser  = auth.currentUser  ?: return
+        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").orderByChild("userId").equalTo(currentUser .uid)
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap?.isMyLocationEnabled = true
-
-            // Start listening for driver location updates once the map is ready
-            listenForDriverLocationUpdates()
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    private fun requestDirections(origin: LatLng, destination: LatLng) {
-        val apiKey = getString(R.string.google_map_api_key)
-        val url = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey"
-
-        val directionsRequest = StringRequest(Request.Method.GET, url, { response ->
-            val jsonResponse = JSONObject(response)
-            val routes = jsonResponse.getJSONArray("routes")
-            if (routes.length() > 0) {
-                val points = routes.getJSONObject(0).getJSONObject("overview_polyline").getString("points")
-                drawPolyline(points)
+        rideRequestRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a new ride request is added
             }
-        }, { error ->
-            Toast.makeText(this, "Failed to get directions: ${error.message}", Toast.LENGTH_SHORT).show()
-        })
 
-        Volley.newRequestQueue(this).add(directionsRequest)
-    }
-
-    private fun drawPolyline(encodedPolyline: String) {
-        val pointsList = PolyUtil.decode(encodedPolyline)
-        googleMap?.addPolyline(PolylineOptions().addAll(pointsList).color(Color.RED))
-    }
-
-    private fun listenForDriverLocationUpdates() {
-        val driverId = intent.getStringExtra("driverId") ?: return
-        val driverLocationRef = firebaseDatabaseReference.child("driver_locations").child(driverId)
-
-        driverLocationRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val lat = snapshot.child("latitude").getValue(Double::class.java)
-                val lon = snapshot.child("longitude").getValue(Double::class.java)
-
-                if (lat != null && lon != null) {
-                    driverLocation = LatLng(lat, lon)
-
-                    // Check if the driver marker already exists
-                    if (driverMarker == null) {
-                        // Create a new marker for the driver's location
-                        driverMarker = googleMap?.addMarker(
-                            MarkerOptions()
-                                .position(driverLocation)
-                                .title("Driver Location")
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)) // Blue marker for driver
-                        )
-                    } else {
-                        // Update the position of the existing marker
-                        driverMarker?.position = driverLocation
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a ride request is updated
+                val status = snapshot.child("status").getValue(String::class.java)
+                when (status) {
+                    "declined" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride request has been declined by the driver.", Toast.LENGTH_SHORT).show()
                     }
-
-                    // Optionally, move the camera to focus on the driver's location
-                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(driverLocation, 15f))
+                    "accepted" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride request has been accepted by the driver.", Toast.LENGTH_SHORT).show()
+                    }
+                    "completed" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride has been completed.", Toast.LENGTH_SHORT).show()
+                        showRatingDialog(snapshot.child("driverId").getValue(String::class.java) ?: "")
+                    }
                 }
             }
 
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                // This is called when a ride request is removed
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a ride request is moved
+            }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.e("UserDashboard", "Failed to load driver location: ${error.message}")
+                Log.e("User Dashboard", "Failed to listen for ride status updates: ${error.message}")
             }
         })
     }
+
 
 
     private fun getAddressFromLocation(latitude: Double, longitude: Double): String? {
@@ -348,36 +332,38 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun listenForRideStatusUpdates() {
-        val rideRequestId = intent.getStringExtra("rideRequestId") ?: return
-        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").child(rideRequestId)
 
-        rideRequestRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val rideStatus = snapshot.child("status").getValue(String::class.java) ?: return
-                Toast.makeText(this@UserDashboard, "Ride status: $rideStatus", Toast.LENGTH_SHORT).show()
+    private fun showRatingDialog(driverId: String) {
+        // Create a RatingBar dynamically
+        val ratingBar = RatingBar(this).apply {
+            numStars = 5
+            stepSize = 1f
+        }
 
-                if (rideStatus == "completed") {
-                    val driverId = snapshot.child("driverId").getValue(String::class.java) ?: return
-
-                    val ratingBar = RatingBar(this@UserDashboard)
-                    AlertDialog.Builder(this@UserDashboard)
-                        .setTitle("Rate Your Driver")
-                        .setView(ratingBar)
-                        .setPositiveButton("Submit") { _, _ ->
-                            val rating = ratingBar.rating
-                            saveDriverRating(driverId, rating)
-                        }
-                        .setNegativeButton("Cancel", null)
-                        .show()
+        // Build the AlertDialog
+        AlertDialog.Builder(this)
+            .setTitle("Rate Your Driver")
+            .setMessage("Please rate your driver:")
+            .setView(ratingBar)
+            .setPositiveButton("Submit") { dialog, _ ->
+                val rating = ratingBar.rating
+                if (rating > 0) {
+                    // Save the driver's rating to Firebase
+                    saveDriverRating(driverId, rating)
+                } else {
+                    Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show()
                 }
+                dialog.dismiss()
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@UserDashboard, "Failed to retrieve ride status", Toast.LENGTH_SHORT).show()
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
             }
-        })
+            .show()
     }
+
+
+
+
 
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val results = FloatArray(1)
