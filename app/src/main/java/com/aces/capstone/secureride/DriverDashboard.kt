@@ -3,6 +3,7 @@ package com.aces.capstone.secureride
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aces.capstone.secureride.adapter.RideRequestAdapter
 import com.aces.capstone.secureride.databinding.ActivityDriverDashboardBinding
@@ -24,8 +26,11 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import android.view.MenuItem
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.io.IOException
 
 class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,9 +45,12 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
     private var driverMarker: Marker? = null
     private lateinit var mapFragment: SupportMapFragment
     private var rideRequestId: String? = null
+    private lateinit var rideRequest: RideRequest
     private var commuterLocation: LatLng? = null
     private var commuterDestination: LatLng? = null
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +61,7 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
         firebaseDatabaseReference = FirebaseDatabase.getInstance().reference
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        rideRequestAdapter = RideRequestAdapter(rideRequests, { rideRequest ->
-            acceptRide(rideRequest)
-        }, { rideRequest ->
-            declineRide(rideRequest)
-        })
+        rideRequestAdapter = RideRequestAdapter(rideRequests, { rideRequest -> acceptRide(rideRequest) }, { rideRequest -> declineRide(rideRequest) })
 
         binding.rideRequestsRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@DriverDashboard)
@@ -66,7 +70,21 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
 
         fetchAvailableRides()
 
+        bottomNavigationView = binding.bottomNavView
 
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navDriverHome -> {
+                    false
+                }
+                R.id.navDriverHistory -> {
+                    val intent = Intent(this@DriverDashboard, DriverHistory::class.java)
+                    startActivity(intent)
+                    true
+                }
+                else -> false
+            }
+        }
 
         // Set up map fragment
         mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -78,27 +96,71 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
         googleMap.uiSettings.isZoomControlsEnabled = true
     }
 
+    private fun checkLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        } else {
+            // Permission already granted, perform location-related tasks
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    val driverLocation = LatLng(it.latitude, it.longitude)
+                    updateDriverLocationOnMap(driverLocation)
+                    openMapForNavigation(commuterLocation!!)  // Start navigation to commuter
+                }
+            }
+        }
+    }
+
     private fun fetchAvailableRides() {
         val rideRequestRef = firebaseDatabaseReference.child("ride_requests").orderByChild("status").equalTo("pending")
         rideRequestRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 rideRequests.clear()
+                Log.d("DriverDashboard", "Ride request count: ${snapshot.childrenCount}")
+
+                var isAnyRideConfirmed = false  // Track if any ride has been confirmed
+
                 for (requestSnapshot in snapshot.children) {
                     val rideRequest = requestSnapshot.getValue(RideRequest::class.java)
                     rideRequest?.let {
                         rideRequests.add(it)
+                        // Check if the ride has been confirmed by the commuter
+                        if (it.confirmationStatus) {
+                            isAnyRideConfirmed = true
+                        }
                     }
                 }
+
                 rideRequestAdapter.notifyDataSetChanged()
 
+                // Show or hide the 'No Requests' text view
                 binding.noRequestsTextView.visibility = if (rideRequests.isEmpty()) View.VISIBLE else View.GONE
+
+                // Show or hide the ride requests RecyclerView based on the availability of requests
                 binding.rideRequestsRecyclerView.visibility = if (rideRequests.isEmpty()) View.GONE else View.VISIBLE
+
+                // Show or hide the map based on whether any ride is confirmed
+                toggleMapVisibility(!isAnyRideConfirmed)
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e("DriverDashboard", "Failed to load ride requests: ${error.message}")
                 Toast.makeText(this@DriverDashboard, "Failed to load ride requests.", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+
+    private fun toggleMapVisibility(shouldHide: Boolean) {
+        if (shouldHide) {
+            // Hide the map and show the RecyclerView
+            mapFragment.view?.visibility = View.GONE
+            binding.rideRequestsRecyclerView.visibility = View.VISIBLE
+        } else {
+            // Show the map and hide the RecyclerView
+            mapFragment.view?.visibility = View.VISIBLE
+            binding.rideRequestsRecyclerView.visibility = View.GONE
+        }
     }
 
     private fun acceptRide(rideRequest: RideRequest) {
@@ -174,6 +236,9 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
                 val rideRequestRef = firebaseDatabaseReference.child("ride_requests").child(rideRequestId!!)
                 rideRequestRef.child("status").setValue("completed").addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        // Save completed ride to Driver History
+                        saveCompletedRideToHistory(rideRequest)
+
                         Toast.makeText(this, "Ride completed successfully", Toast.LENGTH_SHORT).show()
                         // Navigate back to the DriverDashboard
                         val intent = Intent(this@DriverDashboard, DriverDashboard::class.java)
@@ -196,6 +261,36 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun saveCompletedRideToHistory(rideRequest: RideRequest) {
+        val historyRef = firebaseDatabaseReference.child("driver_history").child(auth.currentUser?.uid ?: "")
+
+        // Get the addresses from the RideRequest (assuming they are stored as human-readable addresses)
+        val pickupAddress = rideRequest.pickupLocation ?: "Unknown" // Default to "Unknown" if null
+        val dropoffAddress = rideRequest.dropoffLocation ?: "Unknown" // Default to "Unknown" if null
+
+
+        // Create a map to store the ride history in Firebase
+        val rideHistory: HashMap<String, Any?> = hashMapOf(
+            "rideId" to rideRequest.id,
+            "commuterName" to "${rideRequest.firstName} ${rideRequest.lastName}",
+            "pickuplocation" to pickupAddress, // Use 'pickuplocation' here
+            "dropofflocation" to dropoffAddress, // Use 'dropofflocation' here
+            "status" to "declined",
+            "rideInfo" to rideRequest.rideInfo,
+            "fare" to rideRequest.totalFare,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        historyRef.push().setValue(rideHistory).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("DriverDashboard", "Completed ride saved to history.")
+            } else {
+                Log.e("DriverDashboard", "Failed to save completed ride to history: ${task.exception?.message}")
+            }
+        }
+    }
+
+
     private fun openMapForNavigation(destination: LatLng) {
         val gmmIntentUri = Uri.parse("google.navigation:q=${destination.latitude},${destination.longitude}")
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
@@ -207,18 +302,47 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     private fun declineRide(rideRequest: RideRequest) {
         val rideRequestRef = firebaseDatabaseReference.child("ride_requests").child(rideRequest.id!!)
         rideRequestRef.child("status").setValue("declined").addOnCompleteListener { task ->
             if (task.isSuccessful) {
+                // Save the declined ride to history
+                saveDeclinedRideToHistory(rideRequest)
+
                 Toast.makeText(this, "Ride declined.", Toast.LENGTH_SHORT).show()
                 binding.rideRequestsRecyclerView.visibility = View.VISIBLE
                 binding.noRequestsTextView.visibility = View.VISIBLE
+
+                // Hide the map
                 mapFragment.view?.visibility = View.GONE
             } else {
                 Toast.makeText(this, "Failed to decline ride.", Toast.LENGTH_SHORT).show()
             }
         }
     }
+    private fun saveDeclinedRideToHistory(rideRequest: RideRequest) {
+        val historyRef = firebaseDatabaseReference.child("driver_history").child(auth.currentUser?.uid ?: "")
+
+        // Get the addresses from the RideRequest (assuming they are stored as human-readable addresses)
+        val pickupAddress = rideRequest.pickupLocation ?: "Unknown" // Default to "Unknown" if null
+        val dropoffAddress = rideRequest.dropoffLocation ?: "Unknown" // Default to "Unknown" if null
+
+
+        // Create a map to store the ride history in Firebase
+        val rideHistory: HashMap<String, Any?> = hashMapOf(
+            "rideId" to rideRequest.id,
+            "commuterName" to "${rideRequest.firstName} ${rideRequest.lastName}",
+            "pickuplocation" to pickupAddress, // Use 'pickuplocation' here
+            "dropofflocation" to dropoffAddress, // Use 'dropofflocation' here
+            "status" to "Declined",
+            "rideInfo" to rideRequest.rideInfo,
+            "fare" to rideRequest.totalFare,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+
+        // Save the declined ride to the Firebase database
+        historyRef.push().setValue(rideHistory)
+    }
+
 }
