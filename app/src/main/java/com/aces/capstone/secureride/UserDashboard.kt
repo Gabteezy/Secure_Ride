@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.animation.LinearInterpolator
 import android.widget.RatingBar
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +56,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var auth: FirebaseAuth
     private lateinit var driverLocation: LatLng
     private lateinit var riderLocation: LatLng
+    private var isDialogShown = false
     private var driverMarker: Marker? = null
     private var destinationLatitude: Double? = null
     private var currentRideId: String? = null
@@ -300,11 +302,19 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
                     val lastname = snapshot.child("lastname").getValue(String::class.java) ?: "Unknown"
                     val phone = snapshot.child("phone").getValue(String::class.java) ?: "Unknown"
 
-                    Log.d("UserDashboard", "Driver details fetched: $firstname $lastname, $phone")
+                    // Only log if valid driver details are fetched
+                    if (firstname != "Unknown" || lastname != "Unknown" || phone != "Unknown") {
+                        Log.d("UserDashboard", "Driver details fetched: $firstname $lastname, $phone")
+                    } else {
+                        Log.d("UserDashboard", "Driver details fetched: Unknown Unknown, Unknown")
+                    }
 
-                    // Notify the commuter about the accepted ride
-                    showDriverDetailsDialog(driverId, firstname, lastname, phone)
+                    // Show the driver details dialog if details are valid
+                    if (!isDialogShown && (firstname != "Unknown" || lastname != "Unknown" || phone != "Unknown")) {
+                        showDriverDetailsDialog(driverId, firstname, lastname, phone)
+                    }
                 } else {
+                    Log.d("UserDashboard", "Driver details not found.")
                     Toast.makeText(this@UserDashboard, "Driver details not found.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -315,33 +325,44 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
+
     private fun showDriverDetailsDialog(driverId: String, firstname: String, lastname: String, phone: String) {
-        Log.d("UserDashboard", "Showing driver details dialog")
+        // Inflate the custom layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_driver_details, null)
 
-        val message = """
-        Name: $firstname $lastname
-        Phone: $phone
-        Driver ID: $driverId
-    """.trimIndent()
+        // Set the values dynamically
+        dialogView.findViewById<TextView>(R.id.tvDriverName).text = "Name: $firstname $lastname"
+        dialogView.findViewById<TextView>(R.id.tvPhone).text = "Phone: $phone"
+        dialogView.findViewById<TextView>(R.id.tvDriverId).text = "Driver ID: $driverId"
 
-        // Ensure dialog is shown on the UI thread
+        // Show dialog on the UI thread
         runOnUiThread {
-            AlertDialog.Builder(this)
-                .setTitle("Driver Accepted Your Ride")
-                .setMessage(message)
-                .setPositiveButton("Confirm") { dialog, _ ->
-                    // Handle confirmation action (e.g., update ride status, show a toast, etc.)
-                    Toast.makeText(this@UserDashboard, "Ride Confirmed", Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Decline") { dialog, _ ->
-                    // Handle decline action (e.g., update ride status, show a toast, etc.)
-                    Toast.makeText(this@UserDashboard, "Ride Declined", Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
-                }
-                .show()
+            if (!isDialogShown) {
+                isDialogShown = true
+                AlertDialog.Builder(this)
+                    .setTitle("Driver Accepted Your Ride")
+                    .setView(dialogView)
+                    .setPositiveButton("Confirm") { dialog, _ ->
+                        // Handle confirmation
+                        Toast.makeText(this@UserDashboard, "Ride Confirmed", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        isDialogShown = false  // Reset the flag
+                    }
+                    .setNegativeButton("Decline") { dialog, _ ->
+                        // Handle decline
+                        Toast.makeText(this@UserDashboard, "Ride Declined", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        isDialogShown = false  // Reset the flag
+                    }
+                    .setOnCancelListener {
+                        isDialogShown = false  // Reset the flag if the dialog is cancelled
+                    }
+                    .show()
+            }
         }
     }
+
+
 
 
 
