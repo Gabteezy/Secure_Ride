@@ -3,8 +3,9 @@ package com.aces.capstone.secureride.model
 data class RideRequest(
     val userId: String? = "",
     var id: String? = "",
-    val driverId: String = "",
-    val driverName: String = "",
+    val driverId: String? = null,
+    val driverName: String? = null, // Name of the driver
+    val driverPhone: String? = null, // Contact number of the driver
     val info: String? = "",
     val destination: String? = "",
     val firstName: String? = "",

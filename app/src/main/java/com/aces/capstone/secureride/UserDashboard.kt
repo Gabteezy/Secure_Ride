@@ -57,6 +57,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var riderLocation: LatLng
     private var driverMarker: Marker? = null
     private var destinationLatitude: Double? = null
+    private var currentRideId: String? = null
     private var destinationLongitude: Double? = null
 
     companion object {
@@ -146,9 +147,9 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun requestRide() {
-        val currentUser  = auth.currentUser
-        if (currentUser  == null) {
-            Toast.makeText(this, "User  not authenticated", Toast.LENGTH_SHORT).show()
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -160,7 +161,7 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null && destinationLatitude != null && destinationLongitude != null) {
-                val userReference = firebaseDatabaseReference.child("user").child(currentUser .uid)
+                val userReference = firebaseDatabaseReference.child("user").child(currentUser.uid)
                 userReference.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val firstname = snapshot.child("firstname").getValue(String::class.java) ?: "Unknown"
@@ -176,29 +177,30 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
 
                         val rideId = firebaseDatabaseReference.child("ride_requests").push().key ?: ""
                         val rideInfo = """
-                            Time: $dateTime
-                            Ride ID: $rideId
-                        """.trimIndent()
+                        Time: $dateTime
+                        Ride ID: $rideId
+                    """.trimIndent()
 
                         val distanceInKm = calculateDistance(location.latitude, location.longitude, destinationLatitude!!, destinationLongitude!!)
                         val totalFare = calculatetotalFare(distanceInKm)
 
                         val rideRequestRef = firebaseDatabaseReference.child("ride_requests").push()
                         val rideRequest = RideRequest(
-                            userId = currentUser .uid,
+                            userId = currentUser.uid,
+                            driverId = "",  // This will be updated when a driver accepts the request
                             id = rideRequestRef.key ?: "",
                             info = "Requesting a ride",
                             pickupLocation = pickupAddress ?: "Unknown Pickup Location",
                             dropoffLocation = dropoffAddress ?: "Unknown Dropoff Location",
-                            dropOffLatitude = destinationLatitude!!, // Add dropOffLatitude
-                            dropOffLongitude = destinationLongitude!!, // Add dropOffLongitude
-                            destination = "User 's Destination",
+                            dropOffLatitude = destinationLatitude!!,
+                            dropOffLongitude = destinationLongitude!!,
+                            destination = "User's Destination",
                             firstName = firstname,
                             lastName = lastname,
                             userType = userType,
                             latitude = location.latitude,
                             longitude = location.longitude,
-                            status = "pending",
+                            status = "pending",  // Initial status is "pending"
                             totalFare = totalFare,
                             rideInfo = rideInfo
                         )
@@ -207,11 +209,14 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
 
                         rideRequestRef.setValue(rideRequest).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val commuterLocationRef = firebaseDatabaseReference.child("commuter_locations").child(currentUser .uid)
+                                val commuterLocationRef = firebaseDatabaseReference.child("commuter_locations").child(currentUser.uid)
                                 commuterLocationRef.setValue(LatLng(location.latitude, location.longitude)).addOnCompleteListener { updateTask ->
                                     if (updateTask.isSuccessful) {
                                         Toast.makeText(this@UserDashboard, "Ride requested successfully!", Toast.LENGTH_SHORT).show()
 
+                                        // Save the rideId and start listening for ride status updates
+                                        currentRideId = rideRequest.id
+                                        listenForRideStatusUpdates()
                                     } else {
                                         Toast.makeText(this@UserDashboard, "Failed to update commuter location.", Toast.LENGTH_SHORT).show()
                                     }
@@ -231,6 +236,114 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
+    private fun listenForRideStatusUpdates() {
+        val currentUser = auth.currentUser ?: return
+        val rideRequestRef = firebaseDatabaseReference.child("ride_requests")
+            .orderByChild("userId")
+            .equalTo(currentUser.uid)
+
+        rideRequestRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a new ride request is added
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a ride request is updated
+                val status = snapshot.child("status").getValue(String::class.java)
+                val driverId = snapshot.child("driverId").getValue(String::class.java)
+
+                when (status) {
+                    "declined" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride request has been declined by the driver.", Toast.LENGTH_SHORT).show()
+                    }
+                    "accepted" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride request has been accepted by the driver.", Toast.LENGTH_SHORT).show()
+
+                        // Fetch and show driver details after ride is accepted
+                        if (driverId != null) {
+                            fetchDriverDetails(driverId)
+                        } else {
+                            Toast.makeText(this@UserDashboard, "Driver ID not found.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    "completed" -> {
+                        Toast.makeText(this@UserDashboard, "Your ride has been completed.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                // This is called when a ride request is removed
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is called when a ride request is moved
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("UserDashboard", "Failed to listen for ride status updates: ${error.message}")
+            }
+        })
+    }
+
+
+
+    private fun fetchDriverDetails(driverId: String) {
+        Log.d("UserDashboard", "Fetching details for driver: $driverId")
+        val driverRef = firebaseDatabaseReference.child("user").child(driverId)
+
+        driverRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val firstname = snapshot.child("firstname").getValue(String::class.java) ?: "Unknown"
+                    val lastname = snapshot.child("lastname").getValue(String::class.java) ?: "Unknown"
+                    val phone = snapshot.child("phone").getValue(String::class.java) ?: "Unknown"
+
+                    Log.d("UserDashboard", "Driver details fetched: $firstname $lastname, $phone")
+
+                    // Notify the commuter about the accepted ride
+                    showDriverDetailsDialog(driverId, firstname, lastname, phone)
+                } else {
+                    Toast.makeText(this@UserDashboard, "Driver details not found.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("UserDashboard", "Failed to fetch driver details: ${error.message}")
+            }
+        })
+    }
+
+    private fun showDriverDetailsDialog(driverId: String, firstname: String, lastname: String, phone: String) {
+        Log.d("UserDashboard", "Showing driver details dialog")
+
+        val message = """
+        Name: $firstname $lastname
+        Phone: $phone
+        Driver ID: $driverId
+    """.trimIndent()
+
+        // Ensure dialog is shown on the UI thread
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("Driver Accepted Your Ride")
+                .setMessage(message)
+                .setPositiveButton("Confirm") { dialog, _ ->
+                    // Handle confirmation action (e.g., update ride status, show a toast, etc.)
+                    Toast.makeText(this@UserDashboard, "Ride Confirmed", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Decline") { dialog, _ ->
+                    // Handle decline action (e.g., update ride status, show a toast, etc.)
+                    Toast.makeText(this@UserDashboard, "Ride Declined", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                .show()
+        }
+    }
+
+
 
     private fun setRideLocationMarker(latLng: LatLng) {
         googleMap?.addMarker(MarkerOptions().position(latLng).title("Your Location"))
@@ -255,69 +368,6 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
         handler.post(runnable)
     }
 
-    private fun saveDriverRating(driverId: String, newRating: Float) {
-        val driverRef = firebaseDatabaseReference.child("drivers").child(driverId)
-
-        driverRef.get().addOnSuccessListener { snapshot ->
-            val currentRating = snapshot.child("rating").getValue(Float::class.java) ?: 0f
-            val totalRatings = snapshot.child("totalRatings").getValue(Int::class.java) ?: 0
-
-            val updatedTotalRatings = totalRatings + 1
-            val updatedRating = (currentRating * totalRatings + newRating) / updatedTotalRatings
-
-            driverRef.updateChildren(mapOf(
-                "rating" to updatedRating,
-                "totalRatings" to updatedTotalRatings
-            )).addOnSuccessListener {
-                Toast.makeText(this, "Thank you for your rating!", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Failed to submit rating.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun listenForRideStatusUpdates() {
-        val currentUser  = auth.currentUser  ?: return
-        val rideRequestRef = firebaseDatabaseReference.child("ride_requests").orderByChild("userId").equalTo(currentUser .uid)
-
-        rideRequestRef.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                // This is called when a new ride request is added
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                // This is called when a ride request is updated
-                val status = snapshot.child("status").getValue(String::class.java)
-                when (status) {
-                    "declined" -> {
-                        Toast.makeText(this@UserDashboard, "Your ride request has been declined by the driver.", Toast.LENGTH_SHORT).show()
-                    }
-                    "accepted" -> {
-                        Toast.makeText(this@UserDashboard, "Your ride request has been accepted by the driver.", Toast.LENGTH_SHORT).show()
-                    }
-                    "completed" -> {
-                        Toast.makeText(this@UserDashboard, "Your ride has been completed.", Toast.LENGTH_SHORT).show()
-                        showRatingDialog(snapshot.child("driverId").getValue(String::class.java) ?: "")
-                    }
-                }
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                // This is called when a ride request is removed
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                // This is called when a ride request is moved
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("User Dashboard", "Failed to listen for ride status updates: ${error.message}")
-            }
-        })
-    }
-
-
-
     private fun getAddressFromLocation(latitude: Double, longitude: Double): String? {
         return try {
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
@@ -331,39 +381,6 @@ class UserDashboard : AppCompatActivity(), OnMapReadyCallback {
             null
         }
     }
-
-
-    private fun showRatingDialog(driverId: String) {
-        // Create a RatingBar dynamically
-        val ratingBar = RatingBar(this).apply {
-            numStars = 5
-            stepSize = 1f
-        }
-
-        // Build the AlertDialog
-        AlertDialog.Builder(this)
-            .setTitle("Rate Your Driver")
-            .setMessage("Please rate your driver:")
-            .setView(ratingBar)
-            .setPositiveButton("Submit") { dialog, _ ->
-                val rating = ratingBar.rating
-                if (rating > 0) {
-                    // Save the driver's rating to Firebase
-                    saveDriverRating(driverId, rating)
-                } else {
-                    Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-
-
-
 
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val results = FloatArray(1)

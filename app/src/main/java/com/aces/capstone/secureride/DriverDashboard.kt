@@ -166,39 +166,50 @@ class DriverDashboard : AppCompatActivity(), OnMapReadyCallback {
     private fun acceptRide(rideRequest: RideRequest) {
         rideRequestId = rideRequest.id ?: return
         val rideRequestRef = firebaseDatabaseReference.child("ride_requests").child(rideRequestId!!)
-        rideRequestRef.child("status").setValue("accepted").addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                binding.rideRequestsRecyclerView.visibility = View.GONE
-                binding.noRequestsTextView.visibility = View.GONE
-                mapFragment.view?.visibility = View.VISIBLE
+        val currentDriverId = auth.currentUser?.uid ?: return
 
-                // Commuter location (first stop)
-                commuterLocation = LatLng(rideRequest.latitude, rideRequest.longitude)
-                setCommuterMarker(commuterLocation!!)
+        // Assuming driver details are fetched from a separate "drivers" node in Firebase
+        firebaseDatabaseReference.child("drivers").child(currentDriverId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val driverName = snapshot.child("firstname").getValue(String::class.java)
+                val driverPhone = snapshot.child("phone").getValue(String::class.java)
 
-                // Commuter's destination location (final stop)
-                commuterDestination = LatLng(rideRequest.dropOffLatitude, rideRequest.dropOffLongitude)
+                rideRequestRef.child("status").setValue("accepted").addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Adding driver details to the ride request
+                        rideRequestRef.child("driverId").setValue(currentDriverId)
+                        rideRequestRef.child("driverName").setValue(driverName)
+                        rideRequestRef.child("driverPhone").setValue(driverPhone)
 
-                // Get the driver's current location and navigate to commuter's location
-                if (ActivityCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED) {
-                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                        location?.let {
-                            val driverLocation = LatLng(it.latitude, it.longitude)
-                            updateDriverLocationOnMap(driverLocation)
-                            openMapForNavigation(commuterLocation!!)  // Start navigation to commuter
-                            monitorDriverArrival(driverLocation, commuterLocation!!)
+                        // Proceed with rest of the flow (e.g., setting map markers, navigating to commuter)
+                        binding.rideRequestsRecyclerView.visibility = View.GONE
+                        binding.noRequestsTextView.visibility = View.GONE
+                        mapFragment.view?.visibility = View.VISIBLE
+
+                        commuterLocation = LatLng(rideRequest.latitude, rideRequest.longitude)
+                        setCommuterMarker(commuterLocation!!)
+                        commuterDestination = LatLng(rideRequest.dropOffLatitude, rideRequest.dropOffLongitude)
+
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            location?.let {
+                                val driverLocation = LatLng(it.latitude, it.longitude)
+                                updateDriverLocationOnMap(driverLocation)
+                                openMapForNavigation(commuterLocation!!)
+                                monitorDriverArrival(driverLocation, commuterLocation!!)
+                            }
                         }
+                    } else {
+                        Toast.makeText(this@DriverDashboard, "Failed to accept ride.", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
                 }
-            } else {
-                Toast.makeText(this, "Failed to accept ride.", Toast.LENGTH_SHORT).show()
             }
-        }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("DriverDashboard", "Failed to fetch driver details: ${error.message}")
+            }
+        })
     }
+
 
     private fun updateDriverLocationOnMap(driverLocation: LatLng) {
         driverMarker?.remove()

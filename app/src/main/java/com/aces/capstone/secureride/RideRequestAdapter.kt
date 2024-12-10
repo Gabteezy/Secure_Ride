@@ -24,6 +24,7 @@ class RideRequestAdapter(
         val acceptButton: Button = itemView.findViewById(R.id.acceptButton)
         val declineButton: Button = itemView.findViewById(R.id.declineButton)
 
+
         fun bind(rideRequest: RideRequest) {
             nameTextView.text = "Name: ${rideRequest.firstName ?: "N/A"} ${rideRequest.lastName ?: "N/A"}"
             pickupLocationTextView.text = "Pickup Location: ${rideRequest.pickupLocation ?: "Unknown"}"
