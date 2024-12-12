@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navDriverHome"
+        android:icon="@drawable/vector_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/navDriverHistory"
+        android:icon="@drawable/vector_history"
+        android:title="History" />
+    <item
+        android:id="@+id/navDriverProfile"
+        android:icon="@drawable/vector_user"
+        android:title="Profile" />
+</menu>

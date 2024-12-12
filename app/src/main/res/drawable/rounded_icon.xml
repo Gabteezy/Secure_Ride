@@ -1,0 +1,5 @@
+<!-- res/drawable/rounded_icon.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#f1f1f1"/> <!-- Background color for the layout -->
+    <corners android:radius="500dp" /> <!-- Set to 50% to make it a circle -->
+</shape>

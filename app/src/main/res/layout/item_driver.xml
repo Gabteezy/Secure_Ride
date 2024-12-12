@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Label for Driver ID -->
+    <TextView
+        android:id="@+id/labelDriverId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Driver ID"
+        android:textSize="10sp"
+        android:textColor="@color/gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Driver ID -->
+    <TextView
+        android:id="@+id/driverIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00012"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelDriverId"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Label for Name -->
+    <TextView
+        android:id="@+id/labelName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:textColor="@color/gray"
+        app:layout_constraintStart_toStartOf="@id/driverIdTextView"
+        app:layout_constraintTop_toBottomOf="@id/driverIdTextView" />
+
+    <!-- Driver Name -->
+    <TextView
+        android:id="@+id/driverNameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Gabriel Jarah Bumaya"
+        android:textSize="22sp"
+        android:textColor="@color/black"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/editIcon"
+        app:layout_constraintTop_toBottomOf="@id/labelName"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Edit Icon -->
+    <ImageView
+        android:id="@+id/editIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_edit"
+        android:contentDescription="@string/edit"
+        app:layout_constraintEnd_toStartOf="@id/deleteIcon"
+        app:layout_constraintTop_toTopOf="@id/driverNameTextView"
+        app:layout_constraintBottom_toBottomOf="@id/driverNameTextView"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Delete Icon -->
+    <ImageView
+        android:id="@+id/deleteIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_delete"
+        android:contentDescription="@string/delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/driverNameTextView"
+        app:layout_constraintBottom_toBottomOf="@id/driverNameTextView" />
+</androidx.constraintlayout.widget.ConstraintLayout>
