@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main Content -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFFFF"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:title=""
+            app:titleTextColor="@android:color/black"
+            app:navigationIcon="@drawable/ic_menu">
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Admin Dashboard"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:textSize="20sp" />
+        </com.google.android.material.appbar.MaterialToolbar>
+
+
+        <!-- SwipeRefreshLayout -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <!-- Scrollable Content -->
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white">
+
+
+                    <!-- Your full admin dashboard layout here (like card views etc.) -->
+
+                    <!-- Example: CardView Grid -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:cardElevation="6dp">
+
+                        <androidx.gridlayout.widget.GridLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="16dp"
+                            app:columnCount="2"
+                            android:background="@color/green"
+                            app:rowCount="3"> <!-- Increased rowCount to 3 to fit the new card -->
+
+                            <!-- Drivers Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardViewDrivers"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_columnWeight="1"
+                                app:layout_rowWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardElevation="4dp"
+                                app:cardCornerRadius="12dp"
+                                android:backgroundTint="@android:color/white">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/driverCountText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Drivers"
+                                        android:textSize="14sp"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Rides Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardViewRides"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_columnWeight="1"
+                                app:layout_rowWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardElevation="4dp"
+                                app:cardCornerRadius="12dp"
+                                android:backgroundTint="@android:color/white">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/ridesCountText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Ride History"
+                                        android:textSize="14sp"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Commuters Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardViewCommuters"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_columnWeight="1"
+                                app:layout_rowWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardElevation="4dp"
+                                app:cardCornerRadius="12dp"
+                                android:backgroundTint="@android:color/white">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/commuterCountText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Commuters"
+                                        android:textSize="14sp"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Pending Drivers Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardViewPendingDrivers"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_columnWeight="1"
+                                app:layout_rowWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardElevation="4dp"
+                                app:cardCornerRadius="12dp"
+                                android:backgroundTint="@android:color/white">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/pendingDriversCountText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Pending Drivers"
+                                        android:textSize="14sp"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                            <!-- Gasoline Price Card -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardViewGasPrice"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_columnWeight="1"
+                                app:layout_rowWeight="1"
+                                android:layout_margin="8dp"
+                                app:cardElevation="4dp"
+                                app:cardCornerRadius="12dp"
+                                android:backgroundTint="@android:color/white">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/gasPriceText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="₱0.00"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Gasoline Price"
+                                        android:textSize="14sp"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </androidx.gridlayout.widget.GridLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- Navigation Drawer -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

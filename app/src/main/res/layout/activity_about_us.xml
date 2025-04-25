@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFFFF"
+            app:title="About Us"
+            app:titleTextColor="@android:color/black"
+            app:navigationIcon="@drawable/back_arrow"
+            android:layout_marginStart="-16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- SecureRide Introduction -->
+        <TextView
+            android:id="@+id/tvIntroduction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Welcome to SecureRide!\n\nSecureRide is a tricycle booking platform designed to make commuting in Tagum City safe, convenient, and efficient. Whether you're heading to work, school, or exploring the city, our app connects you with trusted tricycle drivers at the tap of a button."
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- About the Creators -->
+        <TextView
+            android:id="@+id/tvCreators"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Our Team\n\nSecureRide was created by passionate BSIT students at Aces Tagum College, Inc. As part of our commitment to innovation and community service, we developed this app to address local transportation needs, ensuring a seamless experience for both commuters and drivers."
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvIntroduction"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Terms & Conditions Summary -->
+        <TextView
+            android:id="@+id/tvTermsSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Our Commitment to You\n\nBy using SecureRide, you agree to our Terms &amp; Conditions, which ensure a fair and safe experience for everyone. Here’s a quick overview:\n• Register with accurate information to book rides.\n• Respect drivers and follow local laws.\n• Fares are based on distance with a fixed rate per kilometer.\n• No refunds are issued after ride completion.\n• We prioritize your privacy—see our Privacy Policy for details."
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvCreators"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Contact Information -->
+        <TextView
+            android:id="@+id/tvContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Contact Us\n\nHave questions? Reach out to us!\n• Email: informationt316@gmail.com\n• Phone: +63 939 179 8998\n• Address: Aces Tagum College, Inc., Tagum City, Philippines"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvTermsSummary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

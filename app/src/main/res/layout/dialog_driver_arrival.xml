@@ -1,0 +1,26 @@
+<!-- dialog_waiting_for_driver.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvWaitingMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your driver is on the way!"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:textColor="@android:color/black" />
+
+
+    <!-- ImageView for motorcycle GIF -->
+    <ImageView
+        android:id="@+id/ivMotorcycleGIF"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:contentDescription="Motorcycle GIF" />
+</LinearLayout>

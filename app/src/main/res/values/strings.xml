@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SecureRide</string>
+    <string name="app_client_id">508548829715-rlqqa27007tbns1rtb52scl6ij3b2ipm.apps.googleusercontent.com</string>
+    <string name="google_map_api_key">AIzaSyBa_Tf0Sg5a1UD8u0sIVTnAV4O6lGMa5jg</string>
+    <string name="item_label">Numbers</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="back" />
+    <string name="edit" />
+    <string name="delete" />
+    <string name="profile_picture" />
+    <string name="full_screen_image" />
+    <string name="location_disabled_gif" />
+    <string name="pickup_marker" />
+    <string name="dropoff_marker" />
+    <string name="no_internet_gif" />
+</resources>

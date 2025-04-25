@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <!-- Loading spinner -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true" />
+
+    <!-- ImageView for the loading GIF -->
+    <ImageView
+        android:id="@+id/ivWaitingGIF"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Text indicating waiting state -->
+    <TextView
+        android:id="@+id/tvWaitingMessage"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Waiting for a driver to accept your request..."
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+
+    <!-- Optional tips or additional info -->
+    <TextView
+        android:id="@+id/tvAdditionalInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="This may take a moment. Please be patient."
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:textAlignment="center" />
+
+
+</LinearLayout>
